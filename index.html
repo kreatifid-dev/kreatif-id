@@ -6,280 +6,166 @@
 <title>Kreatif ID</title>
 <meta name="theme-color" content="#4A90E2">
 <link rel="manifest" href="manifest.json">
+<script src="https://apis.google.com/js/api.js"></script>
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAUrQNYsj5o6CZLR1o48AeJHUShMEZetJA",
-    authDomain: "kreatif-id-709c5.firebaseapp.com",
-    projectId: "kreatif-id-709c5",
-    storageBucket: "kreatif-id-709c5.firebasestorage.app",
-    messagingSenderId: "152029874076",
-    appId: "1:152029874076:web:02d46ba94093291ff42a59"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyAUrQNYsj5o6CZLR1o48AeJHUShMEZetJA",
+  authDomain: "kreatif-id-709c5.firebaseapp.com",
+  projectId: "kreatif-id-709c5",
+  storageBucket: "kreatif-id-709c5.firebasestorage.app",
+  messagingSenderId: "152029874076",
+  appId: "1:152029874076:web:02d46ba94093291ff42a59"
+};
+
+try {
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
   window.db = db;
   window.addDoc = addDoc;
   window.collection = collection;
+  window.getDocs = getDocs;
+  window.query = query;
+  window.orderBy = orderBy;
+  window.firebaseReady = true;
+} catch(e) {
+  console.warn("Firebase gagal:", e);
+  window.firebaseReady = false;
+}
 </script>
 
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  html, body {
-    height: 100%; overflow: hidden;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #f5f7fa; color: #2c3e50; line-height: 1.6;
-  }
-  .app {
-    position: relative; width: 100%; height: 100vh;
-    overflow: hidden;
-  }
-  .page {
-    position: absolute; top: 0; left: 0;
-    width: 100%; height: 100%;
-    overflow-y: auto; padding: 16px 16px 80px 16px;
-    background: #f5f7fa;
-    transform: translateX(100%);
-    opacity: 0;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    will-change: transform;
-  }
-  .page.active {
-    transform: translateX(0);
-    opacity: 1;
-    z-index: 10;
-  }
-  .page.prev {
-    transform: translateX(-30%);
-    opacity: 0.5;
-    z-index: 5;
-  }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; overflow:hidden; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#f5f7fa; color:#2c3e50; line-height:1.5; }
+.app { position:relative; width:100%; height:100vh; overflow:hidden; }
 
-  /* SPLASH */
-  #splash {
-    display: flex; flex-direction: column; justify-content: center;
-    align-items: center; height: 100vh; width: 100%;
-    background: linear-gradient(135deg, #4A90E2, #357ABD);
-    color: white; text-align: center;
-    position: fixed; top: 0; left: 0; z-index: 9999;
-    padding: 20px;
-    transform: translateX(0); opacity: 1;
-  }
-  #splash.hide { transform: translateX(-100%); opacity: 0; }
-  #splash h1 { font-size: 48px; margin-bottom: 16px; }
-  #splash p { font-size: 16px; opacity: 0.9; }
-  .loading {
-    margin-top: 32px; width: 200px; height: 4px;
-    background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden;
-  }
-  .loading-bar {
-    width: 0%; height: 100%; background: white;
-    animation: loading 2s ease-in-out forwards;
-  }
-  @keyframes loading { from { width: 0%; } to { width: 100%; } }
+.page { position:absolute; top:0; left:0; width:100%; height:100%; overflow-y:auto; padding:16px 16px 90px 16px; background:#f5f7fa; transform:translateX(100%); opacity:0; transition:transform .25s ease, opacity .25s ease; pointer-events:none; visibility:hidden; }
+.page.active { transform:translateX(0); opacity:1; pointer-events:auto; visibility:visible; z-index:10; }
 
-  /* ONBOARDING */
-  #onboarding {
-    display: flex; flex-direction: column; justify-content: center;
-    text-align: center; padding: 40px 20px;
-  }
-  #onboarding h1 { font-size: 32px; color: #4A90E2; margin-bottom: 16px; }
-  #onboarding p { font-size: 16px; color: #666; margin-bottom: 24px; }
-  #onboarding ul { text-align: left; list-style: none; margin-bottom: 24px; }
-  #onboarding li {
-    padding: 12px; background: white; border-radius: 12px;
-    margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); font-size: 14px;
-  }
+#splash { display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; width:100%; background:linear-gradient(135deg,#4A90E2,#357ABD); color:#fff; text-align:center; position:fixed; top:0; left:0; z-index:9999; padding:20px; transition:transform .4s ease, opacity .4s ease; }
+#splash.hide { transform:translateX(-100%); opacity:0; pointer-events:none; }
+#splash h1 { font-size:44px; margin-bottom:12px; }
+#splash p { font-size:15px; opacity:.9; }
+.loading { margin-top:28px; width:200px; height:4px; background:rgba(255,255,255,.3); border-radius:2px; overflow:hidden; }
+.loading-bar { width:0%; height:100%; background:#fff; animation:loading 1.8s ease-in-out forwards; }
+@keyframes loading { from{width:0%} to{width:100%} }
 
-  /* PILIH PERAN */
-  #pilih-peran {
-    display: flex; flex-direction: column; justify-content: center;
-    text-align: center; padding: 40px 20px;
-  }
-  #pilih-peran h1 { font-size: 24px; color: #4A90E2; margin-bottom: 32px; }
-  .peran-btn {
-    display: block; width: 100%; padding: 24px; border-radius: 16px;
-    border: none; font-size: 18px; font-weight: 700; cursor: pointer;
-    margin-bottom: 16px; color: white;
-    transition: transform 0.2s;
-  }
-  .peran-btn:active { transform: scale(0.97); }
-  .peran-vendor { background: #4A90E2; }
-  .peran-klien { background: #27ae60; }
+header { background:#fff; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 8px rgba(0,0,0,.06); position:sticky; top:0; z-index:100; margin:-16px -16px 16px -16px; }
+header h1 { font-size:19px; color:#4A90E2; }
+header nav a { margin-left:12px; color:#4A90E2; font-size:13px; font-weight:600; cursor:pointer; }
 
-  /* HEADER */
-  header {
-    background: white; padding: 16px; display: flex;
-    justify-content: space-between; align-items: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    position: sticky; top: 0; z-index: 100;
-    margin: -16px -16px 16px -16px;
-  }
-  header h1 { font-size: 20px; color: #4A90E2; }
-  header nav a {
-    margin-left: 12px; color: #4A90E2; text-decoration: none;
-    font-size: 14px; font-weight: 600;
-  }
+.kolom { margin-bottom:18px; }
+.kolom h2 { font-size:15px; color:#4A90E2; margin-bottom:10px; font-weight:700; }
+.iklan-container { display:flex; gap:10px; overflow-x:auto; padding-bottom:6px; }
+.iklan-card { min-width:180px; background:#fff; border-radius:12px; padding:14px; box-shadow:0 2px 8px rgba(0,0,0,.06); cursor:pointer; }
+.iklan-card:active { transform:scale(.97); }
+.iklan-card h3 { font-size:13px; margin-bottom:4px; }
+.iklan-card p { font-size:11px; color:#666; }
 
-  /* KOLOM IKLAN */
-  .kolom { margin-bottom: 16px; }
-  .kolom h2 { font-size: 16px; color: #4A90E2; margin-bottom: 12px; }
-  .iklan-container { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; }
-  .iklan-card {
-    min-width: 200px; background: white; border-radius: 12px;
-    padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  }
-  .iklan-card h3 { font-size: 14px; margin-bottom: 4px; }
-  .iklan-card p { font-size: 12px; color: #666; }
+.kategori-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+.kategori-grid button { padding:16px 12px; background:#fff; border-radius:12px; color:#2c3e50; font-size:13px; box-shadow:0 2px 8px rgba(0,0,0,.06); border:none; cursor:pointer; font-family:inherit; font-weight:500; }
+.kategori-grid button:active { transform:scale(.96); background:#eef4ff; }
 
-  /* KATEGORI */
-  .kategori-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
-  }
-  .kategori-grid a {
-    padding: 16px; background: white; border-radius: 12px;
-    text-decoration: none; color: #2c3e50; font-size: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center;
-    transition: transform 0.2s;
-  }
-  .kategori-grid a:active { transform: scale(0.97); }
+.profil-card { background:#fff; border-radius:16px; padding:18px; box-shadow:0 2px 8px rgba(0,0,0,.06); margin-bottom:14px; }
+.profil-header { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+.profil-avatar { width:60px; height:60px; border-radius:50%; background:#4A90E2; display:flex; align-items:center; justify-content:center; color:#fff; font-size:22px; font-weight:700; flex-shrink:0; }
+.profil-info h2 { font-size:18px; margin-bottom:4px; }
+.profil-info p { font-size:13px; color:#666; }
 
-  /* PROFIL */
-  .profil-card {
-    background: white; border-radius: 16px; padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 16px;
-  }
-  .profil-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
-  .profil-avatar {
-    width: 64px; height: 64px; border-radius: 50%;
-    background: #4A90E2; display: flex; align-items: center;
-    justify-content: center; color: white; font-size: 24px; font-weight: 700;
-  }
-  .profil-info h2 { font-size: 20px; margin-bottom: 4px; }
-  .profil-info p { font-size: 14px; color: #666; }
-  .badge {
-    display: inline-block; padding: 4px 12px; border-radius: 12px;
-    font-size: 12px; font-weight: 600;
-  }
-  .badge-verified { background: #e5f0ff; color: #4A90E2; }
-  .badge-pro { background: #e5f5e5; color: #27ae60; }
-  .badge-top { background: #fff5e5; color: #e67e22; }
-  .badge-standard { background: #f0f0f0; color: #666; }
+.badge { display:inline-block; padding:3px 10px; border-radius:10px; font-size:11px; font-weight:600; }
+.badge-top { background:#fff5e5; color:#e67e22; }
+.badge-pro { background:#e5f5e5; color:#27ae60; }
+.badge-standard { background:#f0f0f0; color:#666; }
+.badge-gratis { background:#f0f0f0; color:#666; }
+.badge-info { background:#e5f0ff; color:#4A90E2; }
+.badge-new { background:#ffe5f0; color:#e91e63; }
 
-  /* TOMBOL */
-  .tombol { display: flex; gap: 12px; margin-top: 16px; }
-  .tombol button {
-    flex: 1; padding: 14px; border-radius: 12px;
-    text-align: center; font-weight: 600; font-size: 14px;
-    border: none; cursor: pointer;
-  }
-  .tombol-wa { background: #25D366; color: white; }
-  .tombol-ig { background: #E1306C; color: white; }
-  .tombol-tiktok { background: #000; color: white; }
-  .tombol-primary {
-    width: 100%; padding: 14px; background: #4A90E2; color: white;
-    border: none; border-radius: 12px; font-size: 16px;
-    font-weight: 600; cursor: pointer;
-    transition: transform 0.2s;
-  }
-  .tombol-primary:active { transform: scale(0.97); }
-  .tombol-lapor {
-    display: inline-block; padding: 6px 12px; background: #ffe5e5;
-    color: #d63031; border-radius: 8px; font-size: 12px;
-    border: none; cursor: pointer; margin-top: 8px;
-  }
+.tombol { display:flex; gap:8px; margin-top:12px; }
+.tombol button { flex:1; padding:12px; border-radius:10px; font-weight:600; font-size:13px; border:none; cursor:pointer; font-family:inherit; color:#fff; }
+.tombol-wa { background:#25D366; }
+.tombol-ig { background:#E1306C; }
+.tombol-tiktok { background:#000; }
 
-  /* PORTOFOLIO */
-  .portofolio-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-  }
-  .portofolio-grid div {
-    aspect-ratio: 1; background: #e8f0fe; border-radius: 8px;
-  }
+.tombol-primary { width:100%; padding:14px; background:#4A90E2; color:#fff; border:none; border-radius:12px; font-size:15px; font-weight:600; cursor:pointer; font-family:inherit; margin-top:10px; }
+.tombol-primary:active { transform:scale(.97); }
+.tombol-secondary { width:100%; padding:13px; background:#fff; color:#4A90E2; border:2px solid #4A90E2; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; margin-top:8px; }
+.tombol-lapor { padding:5px 10px; background:#ffe5e5; color:#d63031; border-radius:6px; font-size:11px; border:none; cursor:pointer; font-family:inherit; margin-top:6px; }
 
-  /* ULASAN */
-  .ulasan-item {
-    padding: 12px; background: #f8f9fa; border-radius: 8px;
-    margin-bottom: 8px; font-size: 14px;
-  }
-  .ulasan-item .nama { font-weight: 600; }
-  .ulasan-item .hp { font-size: 12px; color: #999; }
+.portofolio-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
+.portofolio-grid > * { aspect-ratio:1; background:linear-gradient(135deg,#e8f0fe,#c9dcff); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:22px; overflow:hidden; }
+.portofolio-grid img { width:100%; height:100%; object-fit:cover; }
 
-  /* FORM */
-  .form {
-    max-width: 500px; margin: 0 auto; background: white;
-    border-radius: 16px; padding: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  }
-  .form h1 { font-size: 20px; color: #4A90E2; margin-bottom: 16px; text-align: center; }
-  .form label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-  .form input, .form textarea, .form select {
-    width: 100%; padding: 12px; border: 1px solid #ddd;
-    border-radius: 8px; font-size: 14px; margin-bottom: 16px;
-  }
-  .form .note { font-size: 12px; color: #999; margin-top: 12px; text-align: center; }
+.ulasan-item { padding:10px; background:#f8f9fa; border-radius:8px; margin-bottom:8px; font-size:13px; }
+.ulasan-item .nama { font-weight:600; }
 
-  /* RATING */
-  .rating { display: flex; gap: 8px; margin-bottom: 16px; font-size: 24px; cursor: pointer; }
-  .rating span { color: #ddd; }
-  .rating span.active { color: #f39c12; }
+.form { max-width:520px; margin:0 auto 14px; background:#fff; border-radius:16px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+.form h1 { font-size:18px; color:#4A90E2; margin-bottom:14px; text-align:center; }
+.form h3 { font-size:15px; margin-bottom:10px; color:#2c3e50; }
+.form label { display:block; font-size:13px; font-weight:600; margin-bottom:5px; margin-top:10px; }
+.form input, .form textarea, .form select { width:100%; padding:11px; border:1px solid #ddd; border-radius:8px; font-size:14px; font-family:inherit; background:#fff; }
+.form input:focus, .form textarea:focus, .form select:focus { outline:none; border-color:#4A90E2; }
+.form .note { font-size:11px; color:#999; margin-top:10px; text-align:center; }
 
-  /* BOTTOM NAV */
-  .bottom-nav {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    background: white; display: flex; justify-content: space-around;
-    padding: 12px; box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
-    z-index: 1000;
-  }
-  .bottom-nav a {
-    text-decoration: none; color: #999; font-size: 12px; text-align: center;
-    padding: 4px 12px; border-radius: 8px;
-    transition: color 0.2s;
-  }
-  .bottom-nav a.active { color: #4A90E2; font-weight: 600; }
+.rating { display:flex; gap:6px; margin:6px 0; font-size:26px; cursor:pointer; }
+.rating span { color:#ddd; }
+.rating span.active { color:#f39c12; }
 
-  /* FOOTER */
-  footer {
-    padding: 20px; text-align: center; color: #999; font-size: 12px;
-  }
-  footer nav a {
-    margin: 0 8px; color: #4A90E2; text-decoration: none;
-  }
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:#fff; display:flex; justify-content:space-around; padding:8px 4px; box-shadow:0 -2px 8px rgba(0,0,0,.06); z-index:5000; }
+.bottom-nav button { background:transparent; border:none; color:#999; font-size:10px; padding:6px 8px; border-radius:8px; cursor:pointer; font-family:inherit; display:flex; flex-direction:column; align-items:center; gap:2px; min-width:56px; }
+.bottom-nav button .ico { font-size:19px; line-height:1; }
+.bottom-nav button.active { color:#4A90E2; font-weight:600; }
 
-  /* HISTORY */
-  .history-item {
-    background: white; border-radius: 12px; padding: 16px;
-    margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  }
-  .history-item h3 { font-size: 16px; margin-bottom: 4px; }
-  .history-item p { font-size: 14px; color: #666; margin-bottom: 8px; }
-  .history-item a {
-    display: inline-block; padding: 8px 16px; background: #4A90E2;
-    color: white; border-radius: 8px; text-decoration: none; font-size: 14px;
-  }
+footer { padding:18px; text-align:center; color:#999; font-size:11px; }
+footer nav a { margin:0 6px; color:#4A90E2; cursor:pointer; display:inline-block; margin-bottom:5px; }
 
-  /* DOKUMEN */
-  .dokumen {
-    max-width: 600px; margin: 0 auto; background: white;
-    border-radius: 16px; padding: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06); font-size: 14px;
-  }
-  .dokumen h1 { font-size: 20px; color: #4A90E2; margin-bottom: 16px; }
-  .dokumen h2 { font-size: 16px; color: #2c3e50; margin: 16px 0 8px; }
-  .dokumen p { margin-bottom: 8px; }
-  .dokumen ul { padding-left: 20px; margin-bottom: 8px; }
-  .dokumen li { margin-bottom: 4px; }
+.history-item { background:#fff; border-radius:12px; padding:14px; margin-bottom:10px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+.history-item h3 { font-size:15px; margin-bottom:3px; }
+.history-item p { font-size:12px; color:#666; margin-bottom:8px; }
+.history-item button { padding:7px 14px; background:#4A90E2; color:#fff; border-radius:8px; border:none; font-size:13px; cursor:pointer; font-family:inherit; }
 
-  /* BACK BUTTON */
-  .back-btn {
-    display: inline-block; padding: 8px 16px; background: white;
-    color: #4A90E2; border-radius: 8px; text-decoration: none;
-    font-size: 14px; font-weight: 600; margin-bottom: 16px;
-    border: none; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  }
+.dokumen { max-width:600px; margin:0 auto; background:#fff; border-radius:16px; padding:22px; box-shadow:0 2px 8px rgba(0,0,0,.06); font-size:13px; }
+.dokumen h1 { font-size:18px; color:#4A90E2; margin-bottom:14px; }
+.dokumen h2 { font-size:15px; color:#2c3e50; margin:14px 0 6px; }
+.dokumen p { margin-bottom:7px; }
+.dokumen ul { padding-left:18px; margin-bottom:7px; }
+.dokumen li { margin-bottom:3px; }
+
+.back-btn { display:inline-flex; align-items:center; padding:7px 14px; background:#fff; color:#4A90E2; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:14px; border:none; cursor:pointer; font-family:inherit; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+
+.modal { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.55); z-index:9000; display:none; align-items:center; justify-content:center; padding:20px; }
+.modal.show { display:flex; }
+.modal-box { background:#fff; border-radius:16px; padding:22px; width:100%; max-width:380px; }
+.modal-box h3 { font-size:17px; margin-bottom:8px; color:#4A90E2; }
+.modal-box p { font-size:12px; color:#666; margin-bottom:12px; }
+.modal-box input { width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:15px; font-family:inherit; margin-bottom:12px; }
+
+.paket-info { background:#f8f9fa; border-radius:10px; padding:12px; margin-bottom:10px; border-left:4px solid #4A90E2; }
+.paket-info h4 { font-size:14px; color:#4A90E2; margin-bottom:5px; }
+.paket-info ul { list-style:none; padding-left:0; font-size:12px; }
+.paket-info li { padding:2px 0; }
+
+.vendor-list-item { background:#fff; border-radius:12px; padding:12px; margin-bottom:9px; box-shadow:0 2px 8px rgba(0,0,0,.05); cursor:pointer; display:flex; gap:11px; align-items:center; }
+.vendor-list-item:active { transform:scale(.98); }
+.vendor-list-avatar { width:48px; height:48px; border-radius:50%; background:#4A90E2; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:18px; flex-shrink:0; }
+.vendor-list-info { flex:1; min-width:0; }
+.vendor-list-info h3 { font-size:14px; margin-bottom:2px; }
+.vendor-list-info p { font-size:11px; color:#666; }
+
+.alert-box { padding:11px; border-radius:8px; font-size:12px; margin-bottom:12px; line-height:1.5; }
+.alert-warn { background:#fff9e5; border-left:4px solid #f39c12; }
+.alert-info { background:#e8f0fe; border-left:4px solid #4A90E2; }
+.alert-ok { background:#e5f5e5; border-left:4px solid #27ae60; }
+
+.list-check { list-style:none; padding-left:0; }
+.list-check li { padding:7px 11px; background:#f8f9fa; border-radius:8px; margin-bottom:5px; font-size:12px; }
+
+.peran-btn { display:block; width:100%; padding:22px; border-radius:16px; border:none; font-size:17px; font-weight:700; cursor:pointer; margin-bottom:14px; color:#fff; }
+.peran-btn:active { transform:scale(.97); }
+
+.empty { text-align:center; color:#999; font-size:13px; padding:20px; }
 </style>
 </head>
 <body>
@@ -295,41 +181,142 @@
 
 <!-- ONBOARDING -->
 <div id="onboarding" class="page">
-  <h1>🎨 Kreatif ID</h1>
-  <p>Platform yang menghubungkan Anda dengan vendor jasa di seluruh Indonesia.</p>
-  <ul>
-    <li>✅ Cari jasa: Fotografer, MUA, MC, WO, dll</li>
-    <li>✅ Hubungi vendor langsung via WA</li>
-    <li>✅ Beri ulasan untuk vendor</li>
-    <li>✅ 12 Kategori, 191 Jasa</li>
-  </ul>
-  <button class="tombol-primary" onclick="goTo('pilih-peran')">Lanjut</button>
+  <div style="text-align:center; padding-top:30px;">
+    <h1 style="font-size:30px; color:#4A90E2; margin-bottom:12px;">🎨 Kreatif ID</h1>
+    <p style="font-size:15px; color:#666; margin-bottom:22px;">Platform yang menghubungkan Anda dengan vendor jasa di seluruh Indonesia.</p>
+    <ul class="list-check" style="text-align:left;">
+      <li>✅ Cari jasa: Fotografer, MUA, MC, WO, dll</li>
+      <li>✅ Hubungi vendor langsung via WA</li>
+      <li>✅ Lihat portofolio dari Google Drive vendor</li>
+      <li>✅ Beri ulasan untuk vendor</li>
+      <li>✅ 12 Kategori</li>
+    </ul>
+    <button class="tombol-primary" onclick="goTo('pilih-peran')">Lanjut</button>
+  </div>
 </div>
 
 <!-- PILIH PERAN -->
 <div id="pilih-peran" class="page">
-  <h1>Pilih Peran Anda</h1>
-  <button class="peran-btn peran-vendor" onclick="goTo('daftar')">Saya Vendor</button>
-  <button class="peran-btn peran-klien" onclick="goTo('info')">Saya Klien</button>
+  <div style="text-align:center; padding-top:60px;">
+    <h1 style="font-size:22px; color:#4A90E2; margin-bottom:28px;">Pilih Peran Anda</h1>
+    <button class="peran-btn" style="background:#4A90E2;" onclick="goTo('info-vendor')">Saya Vendor</button>
+    <button class="peran-btn" style="background:#27ae60;" onclick="goTo('info-klien')">Saya Klien</button>
+  </div>
 </div>
 
-<!-- INFO AWAL -->
-<div id="info" class="page">
+<!-- INFO KLIEN -->
+<div id="info-klien" class="page">
   <div class="form">
     <h1>ℹ️ INFORMASI PENTING</h1>
-    <p style="margin-bottom: 16px; font-size: 14px; color: #666;">
-      Kreatif ID menghubungkan Anda langsung dengan vendor via WhatsApp.
-    </p>
-    <ul style="list-style: none; margin-bottom: 16px;">
-      <li style="padding: 10px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-size: 14px;">✅ Transaksi dilakukan LANGSUNG dengan vendor</li>
-      <li style="padding: 10px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-size: 14px;">✅ Kreatif ID TIDAK terlibat dalam transaksi</li>
-      <li style="padding: 10px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-size: 14px;">✅ Kreatif ID TIDAK pegang uang</li>
-      <li style="padding: 10px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-size: 14px;">✅ Kreatif ID TIDAK menjamin kualitas servis</li>
+    <p style="margin-bottom:14px; font-size:13px; color:#666;">Kreatif ID menghubungkan Anda langsung dengan vendor via WhatsApp.</p>
+    <ul class="list-check">
+      <li>✅ Transaksi dilakukan LANGSUNG dengan vendor</li>
+      <li>✅ Kreatif ID TIDAK terlibat dalam transaksi</li>
+      <li>✅ Kreatif ID TIDAK pegang uang</li>
+      <li>✅ Kreatif ID TIDAK menjamin kualitas servis</li>
     </ul>
-    <div style="background: #fff9e5; border-left: 4px solid #f39c12; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px;">
-      ⚠️ Jika servis vendor kurang bagus, silakan berikan ulasan di profil vendor agar jadi bahan pertimbangan klien lain.
-    </div>
+    <div class="alert-box alert-warn" style="margin-top:12px;">⚠️ Anda bebas lihat portofolio & ulasan dulu. No HP baru diminta saat Anda klik tombol kontak vendor, supaya klik Anda tercatat sebagai bukti.</div>
     <button class="tombol-primary" onclick="goTo('home')">Saya Mengerti</button>
+  </div>
+</div>
+
+<!-- INFO VENDOR -->
+<div id="info-vendor" class="page">
+  <div class="form">
+    <h1>📋 INFO & PERATURAN VENDOR</h1>
+    <div class="alert-box alert-info">Baca dulu sebelum daftar. Dengan menekan <b>Setuju & Lanjut</b>, Anda menyetujui semua peraturan.</div>
+
+    <h3>📦 Paket & Benefit</h3>
+    <div class="paket-info"><h4>🆓 GRATIS — Rp0</h4><ul>
+      <li>✔️ Profil vendor dasar</li>
+      <li>✔️ Portofolio Google Drive tampil di profil</li>
+      <li>✔️ Muncul di hasil pencarian</li>
+      <li>❌ Tanpa badge</li>
+      <li>❌ Tidak bisa iklan di kolom beranda</li>
+    </ul></div>
+    <div class="paket-info"><h4>💎 STANDARD — Rp49.999/bulan</h4><ul>
+      <li>✔️ Badge STANDARD di profil</li>
+      <li>✔️ Portofolio unlimited</li>
+      <li>✔️ Prioritas pencarian menengah</li>
+      <li>✔️ 1x repost IG @kreatifid</li>
+    </ul></div>
+    <div class="paket-info"><h4>🚀 PRO — Rp99.999/bulan</h4><ul>
+      <li>✔️ Badge PRO + centang biru</li>
+      <li>✔️ Portofolio unlimited + video</li>
+      <li>✔️ Prioritas pencarian tinggi</li>
+      <li>✔️ 4x repost IG + TikTok</li>
+      <li>✔️ Iklan di kolom "STANDARD & PRO" beranda</li>
+    </ul></div>
+    <div class="paket-info"><h4>🏆 TOP — Rp199.999/bulan</h4><ul>
+      <li>✔️ Badge TOP + verifikasi ✅</li>
+      <li>✔️ Portofolio unlimited + video</li>
+      <li>✔️ Prioritas TERTINGGI</li>
+      <li>✔️ 8x repost IG + TikTok</li>
+      <li>✔️ Iklan di kolom "TOP & PRO" beranda</li>
+      <li>✔️ Dibantu promosi di grup WA Kreatif ID</li>
+    </ul></div>
+
+    <h3>📜 Peraturan Vendor</h3>
+    <ul class="list-check">
+      <li>1️⃣ Dilarang upload karya orang lain (plagiat) → akun dihapus.</li>
+      <li>2️⃣ Dilarang pakai foto palsu.</li>
+      <li>3️⃣ Transaksi LANGSUNG dengan klien.</li>
+      <li>4️⃣ No HP klien bersifat RAHASIA.</li>
+      <li>5️⃣ Wajib profesional & tepat waktu.</li>
+      <li>6️⃣ Badge sesuai paket yang dibayar.</li>
+      <li>7️⃣ Klien berhak memberi ulasan.</li>
+      <li>8️⃣ Pelanggaran = suspend permanen tanpa refund.</li>
+    </ul>
+
+    <h3>🖼️ Link Google Drive Portofolio</h3>
+    <div class="alert-box alert-warn">Siapkan folder Google Drive berisi foto karya Anda.<br><br>Cara share: Klik kanan folder → <b>Share</b> → ubah akses jadi <b>"Anyone with the link"</b> → <b>Copy link</b> → tempel di form daftar.<br><br>Kalau akses tidak dibuka, portofolio tidak akan muncul.</div>
+
+    <button class="tombol-primary" onclick="goTo('daftar')">✅ Setuju & Lanjut Daftar</button>
+    <button class="tombol-secondary" onclick="goBack()">← Kembali</button>
+  </div>
+</div>
+
+<!-- DAFTAR VENDOR -->
+<div id="daftar" class="page">
+  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  <div class="form">
+    <h1>📝 Daftar Vendor</h1>
+    <label>Nama Usaha</label>
+    <input type="text" id="namaUsaha" placeholder="Contoh: Ardi Photography">
+    <label>Kategori</label>
+    <select id="kategoriDaftar"></select>
+    <label>Kota</label>
+    <input type="text" id="kotaDaftar" placeholder="Contoh: Jakarta">
+    <label>No WA</label>
+    <input type="tel" id="waDaftar" placeholder="0812-xxxx-xxxx">
+    <label>Harga Mulai</label>
+    <input type="text" id="hargaDaftar" placeholder="Contoh: Rp500rb">
+    <label>Link Folder Google Drive Portofolio</label>
+    <input type="url" id="driveDaftar" placeholder="https://drive.google.com/drive/folders/...">
+    <p class="note" style="text-align:left;">*Harus link FOLDER. Akses wajib "Anyone with the link".</p>
+    <label>Pilih Paket</label>
+    <select id="paketDaftar">
+      <option value="GRATIS">GRATIS — Rp0</option>
+      <option value="STANDARD">STANDARD — Rp49.999/bulan</option>
+      <option value="PRO">PRO — Rp99.999/bulan</option>
+      <option value="TOP">TOP — Rp199.999/bulan</option>
+    </select>
+    <label style="display:flex; align-items:center; gap:8px; margin-top:12px; font-weight:400; font-size:12px;">
+      <input type="checkbox" id="setujuDaftar" style="width:auto; margin:0;">
+      <span>Saya sudah baca & setuju dengan ToS, Privacy, dan Peraturan Vendor.</span>
+    </label>
+    <button class="tombol-primary" onclick="daftarVendor()">Daftar Sekarang</button>
+  </div>
+</div>
+
+<!-- SUKSES DAFTAR -->
+<div id="sukses-daftar" class="page">
+  <div class="form" style="text-align:center; padding-top:50px;">
+    <div style="font-size:60px; margin-bottom:14px;">🎉</div>
+    <h1>Pendaftaran Berhasil!</h1>
+    <p style="font-size:13px; color:#666; margin-bottom:14px;">Tim kami akan memverifikasi data Anda dalam 1×24 jam.</p>
+    <div class="alert-box alert-ok" style="text-align:left;">📌 Cek WhatsApp Anda untuk konfirmasi & info pembayaran paket (jika berbayar).</div>
+    <button class="tombol-primary" onclick="goTo('home')">Ke Beranda</button>
   </div>
 </div>
 
@@ -338,8 +325,8 @@
   <header>
     <h1>🎨 Kreatif ID</h1>
     <nav>
-      <a href="#" onclick="goTo('kategori')">Kategori</a>
-      <a href="#" onclick="goTo('daftar')">Daftar</a>
+      <a onclick="goTo('kategori-list')">Kategori</a>
+      <a onclick="goTo('daftar')">Daftar</a>
     </nav>
   </header>
 
@@ -360,112 +347,50 @@
 
   <section class="kolom">
     <h2>📂 Kategori Jasa</h2>
-    <div class="kategori-grid">
-      <a href="#" onclick="goTo('profil')">🎨 Kreatif & Media</a>
-      <a href="#" onclick="goTo('profil')">🎉 Acara & Event</a>
-      <a href="#" onclick="goTo('profil')">💄 Kecantikan</a>
-      <a href="#" onclick="goTo('profil')">🏠 Rumah & Bangunan</a>
-      <a href="#" onclick="goTo('profil')">📚 Pendidikan</a>
-      <a href="#" onclick="goTo('profil')">💪 Kesehatan</a>
-      <a href="#" onclick="goTo('profil')">💻 Digital</a>
-      <a href="#" onclick="goTo('profil')">🚗 Transport</a>
-      <a href="#" onclick="goTo('profil')">🍽️ Kuliner</a>
-      <a href="#" onclick="goTo('profil')">🔧 Otomotif</a>
-      <a href="#" onclick="goTo('profil')">🆕 Amal & Sosial</a>
-      <a href="#" onclick="goTo('profil')">🆕 Jasa Lainnya</a>
-    </div>
+    <div class="kategori-grid" id="kategoriHome"></div>
   </section>
 
   <footer>
     <p>© 2026 Kreatif ID</p>
     <nav>
-      <a href="#" onclick="goTo('tentang')">Tentang</a>
-      <a href="#" onclick="goTo('faq')">FAQ</a>
-      <a href="#" onclick="goTo('privacy')">Privacy</a>
-      <a href="#" onclick="goTo('tos')">ToS</a>
-      <a href="#" onclick="goTo('disclaimer')">Disclaimer</a>
-      <a href="#" onclick="goTo('kontak')">Kontak</a>
+      <a onclick="goTo('tentang')">Tentang</a>
+      <a onclick="goTo('faq')">FAQ</a>
+      <a onclick="goTo('privacy')">Privacy</a>
+      <a onclick="goTo('tos')">ToS</a>
+      <a onclick="goTo('disclaimer')">Disclaimer</a>
+      <a onclick="goTo('kontak')">Kontak</a>
     </nav>
   </footer>
 </div>
 
-<!-- KATEGORI -->
-<div id="kategori" class="page">
+<!-- KATEGORI LIST -->
+<div id="kategori-list" class="page">
   <button class="back-btn" onclick="goBack()">← Kembali</button>
-  <h1 style="font-size: 20px; color: #4A90E2; margin-bottom: 16px;">📂 Kategori</h1>
-  <div class="kategori-grid">
-    <a href="#" onclick="goTo('profil')">🎨 Kreatif & Media</a>
-    <a href="#" onclick="goTo('profil')">🎉 Acara & Event</a>
-    <a href="#" onclick="goTo('profil')">💄 Kecantikan</a>
-    <a href="#" onclick="goTo('profil')">🏠 Rumah & Bangunan</a>
-    <a href="#" onclick="goTo('profil')">📚 Pendidikan</a>
-    <a href="#" onclick="goTo('profil')">💪 Kesehatan</a>
-    <a href="#" onclick="goTo('profil')">💻 Digital</a>
-    <a href="#" onclick="goTo('profil')">🚗 Transport</a>
-    <a href="#" onclick="goTo('profil')">🍽️ Kuliner</a>
-    <a href="#" onclick="goTo('profil')">🔧 Otomotif</a>
-    <a href="#" onclick="goTo('profil')">🆕 Amal & Sosial</a>
-    <a href="#" onclick="goTo('profil')">🆕 Jasa Lainnya</a>
-  </div>
+  <h1 style="font-size:19px; color:#4A90E2; margin-bottom:14px;">📂 Semua Kategori</h1>
+  <div class="kategori-grid" id="kategoriAll"></div>
 </div>
 
-<!-- PROFIL -->
+<!-- KATEGORI DETAIL -->
+<div id="kategori-detail" class="page">
+  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  <h1 id="katDetailTitle" style="font-size:19px; color:#4A90E2; margin-bottom:14px;"></h1>
+  <div id="katDetailList"></div>
+</div>
+
+<!-- PROFIL VENDOR -->
 <div id="profil" class="page">
   <button class="back-btn" onclick="goBack()">← Kembali</button>
-  <div class="profil-card">
-    <div class="profil-header">
-      <div class="profil-avatar">A</div>
-      <div class="profil-info">
-        <h2>Ardi Photography</h2>
-        <p><span class="badge badge-verified">✅ VERIFIED</span> ⭐ 4.5</p>
-      </div>
-    </div>
-    <p style="font-size: 14px; color: #666; margin-bottom: 12px;">📍 Jakarta | 💰 Mulai Rp500rb</p>
-    <p style="font-size: 14px; color: #666;">Fotografer wedding & prewedding. Berpengalaman 5 tahun.</p>
-    <div class="tombol">
-      <button class="tombol-wa" onclick="goTo('isi-hp')">📱 WA</button>
-      <button class="tombol-ig" onclick="catatKlik('IG')">📷 IG</button>
-      <button class="tombol-tiktok" onclick="catatKlik('TikTok')">🎵 TikTok</button>
-    </div>
-  </div>
-
-  <div class="form" style="margin-bottom: 16px;">
-    <h3>📸 Portofolio</h3>
-    <div class="portofolio-grid">
-      <div></div><div></div><div></div>
-      <div></div><div></div><div></div>
-      <div></div><div></div><div></div>
-    </div>
-  </div>
-
-  <div class="form">
-    <h3>⭐ Ulasan (25)</h3>
-    <div class="ulasan-item">
-      <p class="nama">Budi - 15 Des 2026</p>
-      <p>⭐⭐⭐⭐⭐ "Fotonya bagus, profesional!"</p>
-      <p class="hp">📱 0812-xxxx-7890</p>
-      <button class="tombol-lapor" onclick="lapor()">🚨 Lapor</button>
-    </div>
-    <div class="ulasan-item">
-      <p class="nama">Siti - 20 Des 2026</p>
-      <p>⭐⭐⭐⭐⭐ "Ramah, tepat waktu!"</p>
-      <p class="hp">📱 0813-xxxx-4567</p>
-      <button class="tombol-lapor" onclick="lapor()">🚨 Lapor</button>
-    </div>
-  </div>
+  <div id="profilContent"></div>
 </div>
 
-<!-- ISI NO HP -->
-<div id="isi-hp" class="page">
-  <button class="back-btn" onclick="goBack()">← Kembali</button>
+<!-- CARI -->
+<div id="cari" class="page">
+  <header><h1>🔍 Cari Jasa</h1></header>
   <div class="form">
-    <h1>📝 Isi No HP Anda</h1>
-    <p style="font-size: 14px; color: #666; margin-bottom: 16px;">Sebelum menghubungi vendor, isi No HP Anda untuk verifikasi & history.</p>
-    <label>No HP (wajib)</label>
-    <input type="tel" id="noHP" placeholder="0812-xxxx-xxxx">
-    <button class="tombol-primary" onclick="simpanHP()">Lanjutkan ke WA</button>
-    <p class="note">*No HP hanya untuk verifikasi & history<br>*Tidak akan ditampilkan ke publik</p>
+    <label>Cari nama / kategori / deskripsi</label>
+    <input type="text" id="searchInput" placeholder="Contoh: fotografer, MUA, WO..." oninput="doSearch()">
   </div>
+  <div id="searchResult"></div>
 </div>
 
 <!-- HISTORY -->
@@ -474,12 +399,33 @@
   <div id="historyList"></div>
 </div>
 
+<!-- PROFIL USER -->
+<div id="profil-user" class="page">
+  <header><h1>👤 Profil Saya</h1></header>
+  <div class="form">
+    <div class="profil-header">
+      <div class="profil-avatar" id="userAvatar">?</div>
+      <div class="profil-info">
+        <h2 id="userNama">Belum diisi</h2>
+        <p id="userHP">No HP: -</p>
+      </div>
+    </div>
+    <label>Nama Anda</label>
+    <input type="text" id="inputUserNama" placeholder="Nama Anda">
+    <label>No HP</label>
+    <input type="tel" id="inputUserHP" placeholder="0812-xxxx-xxxx">
+    <button class="tombol-primary" onclick="simpanUser()">Simpan</button>
+    <button class="tombol-secondary" onclick="clearUser()">Reset Data Lokal</button>
+  </div>
+</div>
+
 <!-- ULASAN -->
 <div id="ulasan" class="page">
+  <button class="back-btn" onclick="goBack()">← Kembali</button>
   <div class="form">
     <h1>⭐ Kasih Ulasan</h1>
     <label>Vendor</label>
-    <input type="text" id="vendor" value="Ardi Photography" readonly>
+    <input type="text" id="vendorUlasan" readonly>
     <label>Nama Anda</label>
     <input type="text" id="nama" placeholder="Nama Anda">
     <label>No HP (wajib, tidak ditampilkan)</label>
@@ -490,51 +436,16 @@
     <input type="date" id="tanggalAcara">
     <label>Rating</label>
     <div class="rating" id="rating">
-      <span onclick="setRating(1)">⭐</span>
-      <span onclick="setRating(2)">⭐</span>
-      <span onclick="setRating(3)">⭐</span>
-      <span onclick="setRating(4)">⭐</span>
-      <span onclick="setRating(5)">⭐</span>
+      <span onclick="setRating(1)">★</span>
+      <span onclick="setRating(2)">★</span>
+      <span onclick="setRating(3)">★</span>
+      <span onclick="setRating(4)">★</span>
+      <span onclick="setRating(5)">★</span>
     </div>
     <label>Komentar</label>
     <textarea id="komentar" rows="4" placeholder="Tulis ulasan Anda..."></textarea>
     <button class="tombol-primary" onclick="kirimUlasan()">Kirim Ulasan</button>
-    <p class="note">*No HP & email hanya untuk verifikasi<br>*Tidak akan ditampilkan ke publik</p>
-  </div>
-</div>
-
-<!-- DAFTAR -->
-<div id="daftar" class="page">
-  <button class="back-btn" onclick="goBack()">← Kembali</button>
-  <div class="form">
-    <h1>📝 Daftar Vendor</h1>
-    <label>Nama Usaha</label>
-    <input type="text" id="namaUsaha" placeholder="Contoh: Ardi Photography">
-    <label>Kategori</label>
-    <select id="kategoriDaftar">
-      <option>Fotografer</option>
-      <option>Videografer</option>
-      <option>MUA</option>
-      <option>MC</option>
-      <option>WO</option>
-      <option>Dekorasi</option>
-      <option>Lainnya</option>
-    </select>
-    <label>Kota</label>
-    <input type="text" id="kotaDaftar" placeholder="Contoh: Jakarta">
-    <label>No WA</label>
-    <input type="tel" id="waDaftar" placeholder="0812-xxxx-xxxx">
-    <label>Harga Mulai</label>
-    <input type="text" id="hargaDaftar" placeholder="Contoh: Rp500rb">
-    <label>Pilih Paket</label>
-    <select id="paketDaftar">
-      <option>Gratis</option>
-      <option>STANDARD - Rp49.999/bulan</option>
-      <option>PRO - Rp99.999/bulan</option>
-      <option>TOP - Rp199.999/bulan</option>
-    </select>
-    <button class="tombol-primary" onclick="daftarVendor()">Daftar</button>
-    <p class="note">*Dengan daftar, Anda setuju dengan ToS & Privacy Policy</p>
+    <p class="note">*No HP & email hanya untuk verifikasi, tidak ditampilkan ke publik.</p>
   </div>
 </div>
 
@@ -543,45 +454,12 @@
   <button class="back-btn" onclick="goBack()">← Kembali</button>
   <div class="dokumen">
     <h1>🔒 Privacy Policy</h1>
-    <h2>1. Data yang Kami Kumpulkan</h2>
-    <ul>
-      <li>Nama (boleh nama panggilan)</li>
-      <li>Email</li>
-      <li>No HP</li>
-      <li>Password (terenkripsi)</li>
-      <li>Karya yang diupload</li>
-    </ul>
-    <h2>2. Data yang TIDAK Kami Kumpulkan</h2>
-    <ul>
-      <li>Alamat anak</li>
-      <li>Lokasi anak</li>
-      <li>Data sensitif lainnya</li>
-    </ul>
-    <h2>3. Penggunaan Data</h2>
-    <ul>
-      <li>Untuk menampilkan profil</li>
-      <li>Untuk menampilkan karya</li>
-      <li>Untuk komunikasi platform</li>
-      <li>Untuk verifikasi ulasan</li>
-    </ul>
-    <h2>4. Hak Anda</h2>
-    <ul>
-      <li>Melihat data Anda</li>
-      <li>Menghapus data Anda</li>
-      <li>Menarik persetujuan</li>
-    </ul>
-    <h2>5. Keamanan</h2>
-    <ul>
-      <li>Data dienkripsi</li>
-      <li>Akses terbatas</li>
-      <li>Backup rutin</li>
-    </ul>
-    <h2>6. Anak di Bawah Umur</h2>
-    <ul>
-      <li>Butuh izin orang tua</li>
-      <li>Data terbatas</li>
-      <li>Tidak untuk komersial</li>
-    </ul>
+    <h2>1. Data yang Kami Kumpulkan</h2><ul><li>Nama</li><li>Email</li><li>No HP</li><li>Karya yang diupload</li></ul>
+    <h2>2. Data yang TIDAK Kami Kumpulkan</h2><ul><li>Alamat anak</li><li>Lokasi anak</li><li>Data sensitif lainnya</li></ul>
+    <h2>3. Penggunaan Data</h2><ul><li>Menampilkan profil & karya</li><li>Komunikasi platform</li><li>Verifikasi ulasan</li></ul>
+    <h2>4. Hak Anda</h2><ul><li>Melihat data</li><li>Menghapus data</li><li>Menarik persetujuan</li></ul>
+    <h2>5. Keamanan</h2><ul><li>Data dienkripsi</li><li>Akses terbatas</li></ul>
+    <h2>6. Anak di Bawah Umur</h2><ul><li>Butuh izin orang tua</li></ul>
   </div>
 </div>
 
@@ -590,44 +468,13 @@
   <button class="back-btn" onclick="goBack()">← Kembali</button>
   <div class="dokumen">
     <h1>📜 Syarat & Ketentuan</h1>
-    <h2>1. Hak Cipta</h2>
-    <ul>
-      <li>Karya tetap milik pembuat</li>
-      <li>Kreatif ID hanya menampilkan</li>
-      <li>Pembuat bertanggung jawab atas legalitas karya</li>
-    </ul>
-    <h2>2. Lisensi</h2>
-    <ul>
-      <li>Dengan upload, Anda memberi Kreatif ID lisensi non-eksklusif</li>
-      <li>Lisensi bisa dicabut kapan saja</li>
-    </ul>
-    <h2>3. Anak di Bawah Umur</h2>
-    <ul>
-      <li>Wajib izin orang tua</li>
-      <li>Orang tua bertanggung jawab</li>
-    </ul>
-    <h2>4. Plagiat</h2>
-    <ul>
-      <li>Dilarang upload karya orang lain</li>
-      <li>Jika terbukti, karya dihapus, akun disuspend</li>
-    </ul>
-    <h2>5. Konten Tidak Pantas</h2>
-    <ul>
-      <li>Dilarang upload konten kekerasan, SARA, pornografi</li>
-      <li>Kreatif ID berhak hapus tanpa pemberitahuan</li>
-    </ul>
-    <h2>6. Ulasan</h2>
-    <ul>
-      <li>Ulasan wajib isi No HP</li>
-      <li>No HP tersembunyi dari publik</li>
-      <li>Vendor bisa sanggah</li>
-      <li>Admin verifikasi</li>
-    </ul>
-    <h2>7. Pembatasan Tanggung Jawab</h2>
-    <ul>
-      <li>Kreatif ID tidak bertanggung jawab atas kerugian</li>
-      <li>Kreatif ID tidak bertanggung jawab atas sengketa</li>
-    </ul>
+    <h2>1. Hak Cipta</h2><ul><li>Karya tetap milik pembuat</li><li>Kreatif ID hanya menampilkan</li></ul>
+    <h2>2. Lisensi</h2><ul><li>Dengan upload, Anda memberi lisensi non-eksklusif</li></ul>
+    <h2>3. Anak di Bawah Umur</h2><ul><li>Wajib izin orang tua</li></ul>
+    <h2>4. Plagiat</h2><ul><li>Dilarang upload karya orang lain</li></ul>
+    <h2>5. Konten Tidak Pantas</h2><ul><li>Dilarang SARA, pornografi, kekerasan</li></ul>
+    <h2>6. Ulasan</h2><ul><li>Wajib isi No HP</li><li>No HP tersembunyi dari publik</li></ul>
+    <h2>7. Pembatasan Tanggung Jawab</h2><ul><li>Tidak bertanggung jawab atas kerugian & sengketa</li></ul>
   </div>
 </div>
 
@@ -636,14 +483,12 @@
   <button class="back-btn" onclick="goBack()">← Kembali</button>
   <div class="dokumen">
     <h1>⚠️ Disclaimer</h1>
-    <p>Kreatif ID adalah platform yang mempertemukan penyedia jasa/pembuat karya dengan pengguna. Kami TIDAK terlibat dalam transaksi, kesepakatan, atau hubungan apa pun yang timbul dari pertemuan ini.</p>
+    <p>Kreatif ID adalah platform yang mempertemukan penyedia jasa dengan pengguna. Kami TIDAK terlibat dalam transaksi.</p>
     <ul>
-      <li>Semua transaksi dilakukan DI LUAR platform dan menjadi tanggung jawab masing-masing pihak.</li>
-      <li>Kreatif ID TIDAK menjamin kualitas, keamanan, atau legalitas karya/jasa yang ditampilkan.</li>
-      <li>Segala bentuk kejahatan, penipuan, sengketa, atau kerugian BUKAN tanggung jawab Kreatif ID.</li>
-      <li>Pengguna WAJIB berhati-hati dan melakukan verifikasi sendiri sebelum bertransaksi.</li>
-      <li>Kreatif ID berhak menghapus konten yang melanggar aturan tanpa pemberitahuan.</li>
-      <li>Kreatif ID berhak mengubah aturan ini kapan saja tanpa pemberitahuan.</li>
+      <li>Transaksi DI LUAR platform, tanggung jawab masing-masing pihak.</li>
+      <li>TIDAK menjamin kualitas, keamanan, legalitas karya/jasa.</li>
+      <li>Kerugian/penipuan BUKAN tanggung jawab Kreatif ID.</li>
+      <li>Pengguna WAJIB verifikasi sendiri sebelum transaksi.</li>
     </ul>
   </div>
 </div>
@@ -653,15 +498,9 @@
   <button class="back-btn" onclick="goBack()">← Kembali</button>
   <div class="dokumen">
     <h1>🎨 Tentang Kreatif ID</h1>
-    <p>Kreatif ID adalah platform yang menghubungkan penyedia jasa dengan klien di seluruh Indonesia.</p>
-    <h2>Visi</h2>
-    <p>Menjadi jembatan yang memudahkan siapa saja mencari jasa terpercaya.</p>
-    <h2>Misi</h2>
-    <ul>
-      <li>Memberi ruang bagi vendor untuk tampil</li>
-      <li>Memberi kemudahan bagi klien mencari jasa</li>
-      <li>Tidak pegang uang, tidak ikut campur transaksi</li>
-    </ul>
+    <p>Platform yang menghubungkan penyedia jasa dengan klien di seluruh Indonesia.</p>
+    <h2>Visi</h2><p>Menjadi jembatan yang memudahkan siapa saja mencari jasa terpercaya.</p>
+    <h2>Misi</h2><ul><li>Memberi ruang bagi vendor untuk tampil</li><li>Memberi kemudahan bagi klien</li><li>Tidak pegang uang</li></ul>
   </div>
 </div>
 
@@ -671,13 +510,13 @@
   <div class="dokumen">
     <h1>❓ FAQ</h1>
     <h2>Vendor</h2>
-    <p><strong>Q: Apakah gratis?</strong><br>A: Ya, ada paket gratis. Bayar hanya kalau mau iklan.</p>
-    <p><strong>Q: Apakah bisa bypass?</strong><br>A: Bisa, tapi history & jam terbang tidak bertambah.</p>
-    <p><strong>Q: Badge bisa dicabut?</strong><br>A: Tidak. Badge itu hak Anda karena bayar.</p>
+    <p><strong>Q: Apakah gratis?</strong><br>A: Ya, ada paket GRATIS.</p>
+    <p><strong>Q: Badge bisa dicabut?</strong><br>A: Tidak, kecuali pelanggaran berat.</p>
+    <p><strong>Q: Link Drive tidak muncul?</strong><br>A: Pastikan akses "Anyone with the link".</p>
     <h2>Klien</h2>
-    <p><strong>Q: Apakah bayar di app?</strong><br>A: Tidak. Bayar langsung ke vendor.</p>
-    <p><strong>Q: Bagaimana kalau vendor nakal?</strong><br>A: Lapor via app. Akan diverifikasi.</p>
-    <p><strong>Q: Apakah identitas pelapor aman?</strong><br>A: Ya, dirahasiakan.</p>
+    <p><strong>Q: Bayar di app?</strong><br>A: Tidak. Bayar langsung ke vendor.</p>
+    <p><strong>Q: Kapan isi No HP?</strong><br>A: Saat mau klik kontak vendor.</p>
+    <p><strong>Q: Vendor nakal?</strong><br>A: Lapor via tombol 🚨 di ulasan.</p>
   </div>
 </div>
 
@@ -697,260 +536,601 @@
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <a href="#" onclick="goTo('home')" id="nav-home" class="active">🏠 Home</a>
-  <a href="#" onclick="goTo('profil')" id="nav-cari">🔍 Cari</a>
-  <a href="#" onclick="goTo('history')" id="nav-history">📋 History</a>
-  <a href="#" onclick="goTo('ulasan')" id="nav-profil">👤 Profil</a>
+  <button id="nav-home" onclick="goTo('home')"><span class="ico">🏠</span>Home</button>
+  <button id="nav-cari" onclick="goTo('cari')"><span class="ico">🔍</span>Cari</button>
+  <button id="nav-history" onclick="goTo('history')"><span class="ico">📋</span>History</button>
+  <button id="nav-profil" onclick="goTo('profil-user')"><span class="ico">👤</span>Profil</button>
 </nav>
 
-<script>
-/* ===== NAVIGASI DENGAN HISTORY ===== */
-var currentPage = 'splash';
-var pageStack = [];
+<!-- MODAL HP -->
+<div id="modalHP" class="modal">
+  <div class="modal-box">
+    <h3>📱 Isi No HP Anda</h3>
+    <p>Sebelum menghubungi vendor, isi No HP untuk verifikasi & mencatat klik Anda. Tidak ditampilkan ke publik.</p>
+    <input type="tel" id="modalNoHP" placeholder="0812-xxxx-xxxx">
+    <button class="tombol-primary" onclick="submitModalHP()">Lanjut ke WA</button>
+    <button class="tombol-secondary" onclick="closeModal()">Batal</button>
+  </div>
+</div>
 
-function goTo(id) {
-  if (id === currentPage) return;
-  
-  var current = document.getElementById(currentPage);
+<script>
+/* ============ API KEY DRIVE ============ */
+var DRIVE_API_KEY = "AIzaSyDFmr6CPgK6LnxchUTU0cP0BbOT98TEXz8";
+
+/* ============ DATA KATEGORI + VENDOR ============ */
+var KATEGORI = [
+  { id:'kreatif-media', nama:'🎨 Kreatif & Media', vendors:[
+    { id:'ardi', nama:'Ardi Photography', kota:'Jakarta', harga:'Rp500rb', rating:4.8, badge:'TOP', desc:'Fotografer wedding & prewedding berpengalaman 5 tahun.', wa:'6281234567890', drive:'' },
+    { id:'budi', nama:'Budi Video', kota:'Bandung', harga:'Rp1jt', rating:4.7, badge:'PRO', desc:'Videografer cinematic, spesialis wedding.', wa:'6281234567891', drive:'' },
+    { id:'citra', nama:'Citra Design', kota:'Surabaya', harga:'Rp300rb', rating:4.5, badge:'STANDARD', desc:'Desain logo, banner, feed IG.', wa:'6281234567892', drive:'' },
+    { id:'dimas', nama:'Dimas Editor', kota:'Yogyakarta', harga:'Rp250rb', rating:4.4, badge:'STANDARD', desc:'Editing video TikTok, Reels, YouTube.', wa:'6281234567893', drive:'' }
+  ]},
+  { id:'acara-event', nama:'🎉 Acara & Event', vendors:[
+    { id:'dewi', nama:'Dewi WO', kota:'Jakarta', harga:'Rp5jt', rating:4.6, badge:'PRO', desc:'Wedding organizer profesional, 100+ acara.', wa:'6281234567894', drive:'' },
+    { id:'eko', nama:'Eko MC', kota:'Semarang', harga:'Rp2jt', rating:4.5, badge:'STANDARD', desc:'MC pernikahan formal & santai.', wa:'6281234567895', drive:'' },
+    { id:'fani', nama:'Fani Dekor', kota:'Bali', harga:'Rp3jt', rating:4.9, badge:'TOP', desc:'Dekorasi pernikahan & event mewah.', wa:'6281234567896', drive:'' },
+    { id:'gita', nama:'Gita Catering', kota:'Medan', harga:'Rp50rb/pax', rating:4.3, badge:'STANDARD', desc:'Catering nusantara & prasmanan.', wa:'6281234567897', drive:'' }
+  ]},
+  { id:'kecantikan', nama:'💄 Kecantikan', vendors:[
+    { id:'sarah', nama:'Sarah MUA', kota:'Bandung', harga:'Rp1jt', rating:4.9, badge:'TOP', desc:'Make up artist wedding & prewedding.', wa:'6281234567898', drive:'' },
+    { id:'hana', nama:'Hana Hair', kota:'Jakarta', harga:'Rp300rb', rating:4.7, badge:'PRO', desc:'Hair do & styling untuk acara.', wa:'6281234567899', drive:'' },
+    { id:'indah', nama:'Indah Spa', kota:'Bali', harga:'Rp200rb', rating:4.5, badge:'STANDARD', desc:'Spa & massage panggilan.', wa:'6281234567800', drive:'' }
+  ]},
+  { id:'rumah-bangunan', nama:'🏠 Rumah & Bangunan', vendors:[
+    { id:'joko', nama:'Joko Kontraktor', kota:'Jakarta', harga:'Rp50jt', rating:4.6, badge:'PRO', desc:'Bangun & renovasi rumah.', wa:'6281234567801', drive:'' },
+    { id:'karya', nama:'Karya Interior', kota:'Surabaya', harga:'Rp20jt', rating:4.4, badge:'STANDARD', desc:'Desain interior minimalis & modern.', wa:'6281234567802', drive:'' },
+    { id:'lancar', nama:'Lancar Renovasi', kota:'Bekasi', harga:'Rp10jt', rating:4.3, badge:'STANDARD', desc:'Renovasi kamar mandi & dapur.', wa:'6281234567803', drive:'' }
+  ]},
+  { id:'pendidikan', nama:'📚 Pendidikan', vendors:[
+    { id:'smart', nama:'Smart Les', kota:'Jakarta', harga:'Rp100rb/jam', rating:4.8, badge:'PRO', desc:'Les privat SD-SMA semua mapel.', wa:'6281234567804', drive:'' },
+    { id:'bimbel', nama:'Bimbel Cerdas', kota:'Bandung', harga:'Rp500rb/bln', rating:4.5, badge:'STANDARD', desc:'Bimbel intensif UTBK & CPNS.', wa:'6281234567805', drive:'' },
+    { id:'guru', nama:'Guru Privat ID', kota:'Online', harga:'Rp80rb/jam', rating:4.4, badge:'STANDARD', desc:'Les online matematika & fisika.', wa:'6281234567806', drive:'' }
+  ]},
+  { id:'kesehatan', nama:'💪 Kesehatan', vendors:[
+    { id:'fisio', nama:'Fisio Sehat', kota:'Jakarta', harga:'Rp250rb', rating:4.7, badge:'PRO', desc:'Fisioterapi panggilan.', wa:'6281234567807', drive:'' },
+    { id:'care', nama:'Care Perawat', kota:'Surabaya', harga:'Rp150rb/hari', rating:4.5, badge:'STANDARD', desc:'Perawat lansia & pasca operasi.', wa:'6281234567808', drive:'' },
+    { id:'yoga', nama:'Yoga Studio', kota:'Bali', harga:'Rp100rb', rating:4.6, badge:'STANDARD', desc:'Kelas yoga privat & grup.', wa:'6281234567809', drive:'' }
+  ]},
+  { id:'digital', nama:'💻 Digital', vendors:[
+    { id:'webpro', nama:'Web Pro ID', kota:'Jakarta', harga:'Rp5jt', rating:4.9, badge:'TOP', desc:'Jasa pembuatan website & toko online.', wa:'6281234567810', drive:'' },
+    { id:'seo', nama:'SEO Master', kota:'Bandung', harga:'Rp2jt/bln', rating:4.6, badge:'PRO', desc:'SEO & Google Ads.', wa:'6281234567811', drive:'' },
+    { id:'sosmed', nama:'Sosmed Manager', kota:'Online', harga:'Rp1jt/bln', rating:4.4, badge:'STANDARD', desc:'Kelola IG, TikTok, FB brand Anda.', wa:'6281234567812', drive:'' }
+  ]},
+  { id:'transport', nama:'🚗 Transport', vendors:[
+    { id:'sewamobil', nama:'Sewa Mobil Jaya', kota:'Jakarta', harga:'Rp350rb/hari', rating:4.5, badge:'PRO', desc:'Sewa mobil + driver.', wa:'6281234567813', drive:'' },
+    { id:'driver', nama:'Driver Bandung', kota:'Bandung', harga:'Rp200rb', rating:4.4, badge:'STANDARD', desc:'Driver harian & antar kota.', wa:'6281234567814', drive:'' },
+    { id:'travel', nama:'Travel Antar Kota', kota:'Surabaya', harga:'Rp150rb', rating:4.3, badge:'STANDARD', desc:'Travel Surabaya-Malang-Jakarta.', wa:'6281234567815', drive:'' }
+  ]},
+  { id:'kuliner', nama:'🍽️ Kuliner', vendors:[
+    { id:'dapur', nama:'Dapur Nusantara', kota:'Jakarta', harga:'Rp30rb/pax', rating:4.7, badge:'PRO', desc:'Catering harian & acara.', wa:'6281234567816', drive:'' },
+    { id:'kue', nama:'Kue Manis', kota:'Bandung', harga:'Rp100rb', rating:4.5, badge:'STANDARD', desc:'Kue ulang tahun & hantaran.', wa:'6281234567817', drive:'' },
+    { id:'kateringsehat', nama:'Katering Sehat', kota:'Bali', harga:'Rp45rb/pax', rating:4.4, badge:'STANDARD', desc:'Katering diet & sehat.', wa:'6281234567818', drive:'' }
+  ]},
+  { id:'otomotif', nama:'🔧 Otomotif', vendors:[
+    { id:'bengkel', nama:'Bengkel Maju', kota:'Jakarta', harga:'Rp100rb', rating:4.6, badge:'PRO', desc:'Servis mobil semua merk.', wa:'6281234567819', drive:'' },
+    { id:'cuci', nama:'Cuci Mobil Kilat', kota:'Bandung', harga:'Rp50rb', rating:4.4, badge:'STANDARD', desc:'Cuci mobil panggilan.', wa:'6281234567820', drive:'' },
+    { id:'servismotor', nama:'Servis Motor Jaya', kota:'Semarang', harga:'Rp75rb', rating:4.3, badge:'STANDARD', desc:'Servis motor panggilan.', wa:'6281234567821', drive:'' }
+  ]},
+  { id:'amal-sosial', nama:'🆕 Amal & Sosial', vendors:[
+    { id:'yayasan', nama:'Yayasan Peduli', kota:'Jakarta', harga:'Donasi', rating:4.8, badge:'STANDARD', desc:'Penyaluran donasi & santunan.', wa:'6281234567822', drive:'' },
+    { id:'panti', nama:'Panti Asuhan Kasih', kota:'Bandung', harga:'Donasi', rating:4.7, badge:'STANDARD', desc:'Panti asuhan & pendidikan gratis.', wa:'6281234567823', drive:'' }
+  ]},
+  { id:'lainnya', nama:'🆕 Jasa Lainnya', vendors:[
+    { id:'pindahan', nama:'Jasa Pindahan', kota:'Jakarta', harga:'Rp500rb', rating:4.4, badge:'STANDARD', desc:'Pindahan rumah & kantor.', wa:'6281234567824', drive:'' },
+    { id:'bersih', nama:'Jasa Bersih Rumah', kota:'Bandung', harga:'Rp150rb', rating:4.5, badge:'STANDARD', desc:'Bersih rumah & apartemen.', wa:'6281234567825', drive:'' }
+  ]}
+];
+
+/* ============ NAVIGASI ============ */
+var currentPage = null;
+var navStack = [];
+
+function showPage(id) {
   var next = document.getElementById(id);
-  
-  if (current) {
-    current.classList.remove('active');
-    current.classList.add('prev');
-    setTimeout(function() {
-      current.classList.remove('prev');
-    }, 300);
+  if (!next) return;
+  if (currentPage && currentPage !== id) {
+    var cur = document.getElementById(currentPage);
+    if (cur) cur.classList.remove('active');
   }
-  
-  if (next) {
-    next.classList.add('active');
-    next.scrollTop = 0;
-  }
-  
-  pageStack.push(currentPage);
+  next.classList.add('active');
+  next.scrollTop = 0;
   currentPage = id;
-  
-  // Simpan ke history HP
-  history.pushState({ page: id }, '', '#' + id);
-  
-  // Update bottom nav
   updateNav(id);
 }
 
+function goTo(id) {
+  if (id === currentPage) return;
+  navStack.push(id);
+  showPage(id);
+  try { history.pushState({ page: id }, '', '#' + id); } catch(e) {}
+}
+
 function goBack() {
-  if (pageStack.length > 0) {
-    var prev = pageStack.pop();
-    var current = document.getElementById(currentPage);
-    var next = document.getElementById(prev);
-    
-    if (current) {
-      current.classList.remove('active');
-      current.classList.add('next-out');
-      setTimeout(function() {
-        current.classList.remove('next-out');
-      }, 300);
-    }
-    
-    if (next) {
-      next.classList.add('active');
-      next.scrollTop = 0;
-    }
-    
-    currentPage = prev;
-    updateNav(prev);
-    history.pushState({ page: prev }, '', '#' + prev);
-  }
+  if (navStack.length <= 1) return;
+  navStack.pop();
+  var prev = navStack[navStack.length - 1];
+  showPage(prev);
 }
 
 function updateNav(id) {
-  document.querySelectorAll('.bottom-nav a').forEach(function(a) {
-    a.classList.remove('active');
-  });
+  document.querySelectorAll('.bottom-nav button').forEach(function(b) { b.classList.remove('active'); });
   if (id === 'home') document.getElementById('nav-home').classList.add('active');
-  if (id === 'profil') document.getElementById('nav-cari').classList.add('active');
-  if (id === 'history') document.getElementById('nav-history').classList.add('active');
-  if (id === 'ulasan') document.getElementById('nav-profil').classList.add('active');
+  else if (id === 'cari') document.getElementById('nav-cari').classList.add('active');
+  else if (id === 'history') document.getElementById('nav-history').classList.add('active');
+  else if (id === 'profil-user') document.getElementById('nav-profil').classList.add('active');
 }
 
-/* ===== SPLASH HANYA SEKALI ===== */
+window.addEventListener('popstate', function() {
+  if (navStack.length > 1) {
+    navStack.pop();
+    showPage(navStack[navStack.length - 1]);
+  }
+});
+
+/* ============ SWIPE ============ */
+var tX = 0, tY = 0;
+document.addEventListener('touchstart', function(e) {
+  tX = e.changedTouches[0].screenX;
+  tY = e.changedTouches[0].screenY;
+}, { passive: true });
+document.addEventListener('touchend', function(e) {
+  var dx = e.changedTouches[0].screenX - tX;
+  var dy = e.changedTouches[0].screenY - tY;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 90 && dx > 0) goBack();
+}, { passive: true });
+
+/* ============ SPLASH ============ */
 window.addEventListener('load', function() {
-  history.replaceState({ page: 'onboarding' }, '', '#onboarding');
   setTimeout(function() {
-    var splash = document.getElementById('splash');
-    if (splash) {
-      splash.classList.add('hide');
-      setTimeout(function() {
-        splash.style.display = 'none';
-      }, 400);
+    var s = document.getElementById('splash');
+    if (s) {
+      s.classList.add('hide');
+      setTimeout(function() { s.style.display = 'none'; }, 400);
     }
     goTo('onboarding');
-  }, 2000);
+  }, 1800);
 });
 
-/* ===== TOMBOL BACK HP ===== */
-window.addEventListener('popstate', function(e) {
-  if (pageStack.length > 0) {
-    goBack();
-  } else {
-    // Kalau tidak ada history, keluar app
-    if (confirm('Keluar dari Kreatif ID?')) {
-      window.history.back();
-    } else {
-      history.pushState({ page: currentPage }, '', '#' + currentPage);
-    }
-  }
-});
+/* ============ DRIVE API ============ */
+var driveReady = false;
 
-/* ===== SWIPE KIRI/KANAN ===== */
-var touchStartX = 0;
-var touchEndX = 0;
-var touchStartY = 0;
-var touchEndY = 0;
-
-document.addEventListener('touchstart', function(e) {
-  touchStartX = e.changedTouches[0].screenX;
-  touchStartY = e.changedTouches[0].screenY;
-}, false);
-
-document.addEventListener('touchend', function(e) {
-  touchEndX = e.changedTouches[0].screenX;
-  touchEndY = e.changedTouches[0].screenY;
-  
-  var diffX = touchEndX - touchStartX;
-  var diffY = touchEndY - touchStartY;
-  
-  // Hanya swipe horizontal (bukan scroll vertikal)
-  if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 80) {
-    if (diffX > 0) {
-      // Swipe kanan = back
-      goBack();
-    } else {
-      // Swipe kiri = forward (kalau ada)
-      // Tidak ada aksi untuk sekarang
-    }
-  }
-}, false);
-
-/* ===== IKLAN ===== */
-var iklanKolom1 = [
-  { nama: 'Ardi Photography', badge: 'TOP', rating: 5.0 },
-  { nama: 'Budi Video', badge: 'PRO', rating: 4.7 }
-];
-var iklanKolom2 = [
-  { nama: 'Siti MUA', badge: 'VERIFIED', rating: 4.5 },
-  { nama: 'Dewi WO', badge: 'STANDARD', rating: 4.0 }
-];
-var iklanKolom3 = [
-  { nama: 'Info Kreatif ID', badge: 'INFO', rating: '-' },
-  { nama: 'New Member', badge: 'NEW', rating: '-' }
-];
-
-function renderIklan(containerId, data) {
-  var container = document.getElementById(containerId);
-  if (!container) return;
-  container.innerHTML = data.map(function(item) {
-    return '<div class="iklan-card"><h3>' + item.nama + '</h3><p>' + item.badge + ' | ⭐ ' + item.rating + '</p></div>';
-  }).join('');
-}
-renderIklan('kolom1', iklanKolom1);
-renderIklan('kolom2', iklanKolom2);
-renderIklan('kolom3', iklanKolom3);
-
-/* ===== SIMPAN NO HP ===== */
-async function simpanHP() {
-  var noHP = document.getElementById('noHP').value;
-  if (!noHP) { alert('Isi No HP dulu!'); return; }
-  try {
-    await window.addDoc(window.collection(window.db, "klien"), {
-      noHP: noHP, vendor: "Ardi Photography", tanggal: new Date()
+function initDrive() {
+  if (!DRIVE_API_KEY || DRIVE_API_KEY.length < 20) return;
+  if (typeof gapi === 'undefined') return;
+  gapi.load('client', function() {
+    gapi.client.init({
+      apiKey: DRIVE_API_KEY,
+      discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"]
+    }).then(function() {
+      driveReady = true;
+      console.log("✅ Drive API siap");
+    }).catch(function(err) {
+      console.warn("Drive init gagal:", err);
     });
-    var historyData = JSON.parse(localStorage.getItem('history') || '[]');
-    historyData.push({ vendor: 'Ardi Photography', tanggal: new Date().toISOString(), noHP: noHP });
-    localStorage.setItem('history', JSON.stringify(historyData));
-    window.location.href = 'https://wa.me/6281234567890';
-  } catch (e) { alert('Gagal: ' + e.message); }
+  });
+}
+initDrive();
+
+function extractFolderId(url) {
+  if (!url) return null;
+  var m = url.match(/folders\/([a-zA-Z0-9_-]+)/);
+  if (m) return m[1];
+  m = url.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+  if (m) return m[1];
+  return null;
 }
 
-/* ===== CATAT KLIK ===== */
-async function catatKlik(aksi) {
-  var noHP = localStorage.getItem('klienNoHP') || 'tidak diketahui';
-  try {
-    await window.addDoc(window.collection(window.db, "klik"), {
-      noHP: noHP, vendor: "Ardi Photography", aksi: aksi, tanggal: new Date()
-    });
-    alert('Klik ' + aksi + ' tercatat!');
-  } catch (e) { alert('Gagal: ' + e.message); }
-}
-
-/* ===== HISTORY ===== */
-function renderHistory() {
-  var historyData = JSON.parse(localStorage.getItem('history') || '[]');
-  var container = document.getElementById('historyList');
-  if (!container) return;
-  if (historyData.length === 0) {
-    container.innerHTML = '<p style="text-align:center;color:#999;">Belum ada history.</p>';
+async function loadDrivePorto(folderUrl, el) {
+  var fid = extractFolderId(folderUrl);
+  if (!fid) {
+    el.innerHTML = '<p style="color:#999;font-size:12px;grid-column:1/-1">Link Drive tidak valid.</p>';
     return;
   }
-  container.innerHTML = historyData.map(function(item) {
-    return '<div class="history-item"><h3>' + item.vendor + '</h3><p>' + new Date(item.tanggal).toLocaleDateString('id-ID') + '</p><a href="#" onclick="goTo(\'ulasan\')">Kasih Ulasan</a></div>';
+  if (driveReady) {
+    try {
+      var res = await gapi.client.drive.files.list({
+        q: "'" + fid + "' in parents and mimeType contains 'image/' and trashed=false",
+        fields: "files(id,name,thumbnailLink,webViewLink)",
+        pageSize: 30
+      });
+      var files = res.result.files || [];
+      if (!files.length) {
+        el.innerHTML = '<p style="color:#999;font-size:12px;grid-column:1/-1">Folder kosong / tidak ada gambar.</p>';
+        return;
+      }
+      el.innerHTML = files.map(function(f) {
+        var thumb = f.thumbnailLink ? f.thumbnailLink.replace(/=s\d+/, '=s400') : '';
+        return '<a href="' + f.webViewLink + '" target="_blank" rel="noopener">' +
+          (thumb ? '<img src="' + thumb + '" loading="lazy" alt="">' : '🖼️') + '</a>';
+      }).join('');
+      return;
+    } catch(e) {
+      console.warn("Drive API gagal, fallback iframe:", e);
+    }
+  }
+  el.innerHTML = '<iframe src="https://drive.google.com/embeddedfolderview?id=' + fid + '#grid" style="width:100%;height:380px;border:0;border-radius:12px;grid-column:1/-1" loading="lazy"></iframe>';
+}
+
+/* ============ RENDER KATEGORI ============ */
+function renderKategoriGrid(cid) {
+  var el = document.getElementById(cid);
+  if (!el) return;
+  el.innerHTML = KATEGORI.map(function(k) {
+    return '<button onclick="bukaKategori(\'' + k.id + '\')">' + k.nama + '</button>';
+  }).join('');
+}
+renderKategoriGrid('kategoriHome');
+renderKategoriGrid('kategoriAll');
+
+(function() {
+  var sel = document.getElementById('kategoriDaftar');
+  if (sel) {
+    sel.innerHTML = KATEGORI.map(function(k) {
+      return '<option value="' + k.id + '">' + k.nama + '</option>';
+    }).join('');
+  }
+})();
+
+function bukaKategori(id) {
+  var kat = KATEGORI.find(function(k) { return k.id === id; });
+  if (!kat) return;
+  document.getElementById('katDetailTitle').textContent = kat.nama;
+  var list = document.getElementById('katDetailList');
+  if (!kat.vendors.length) {
+    list.innerHTML = '<p class="empty">Belum ada vendor di kategori ini.</p>';
+  } else {
+    list.innerHTML = kat.vendors.map(function(v) {
+      var bc = 'badge-' + v.badge.toLowerCase();
+      return '<div class="vendor-list-item" onclick="bukaProfil(\'' + kat.id + '\',\'' + v.id + '\')">' +
+        '<div class="vendor-list-avatar">' + v.nama.charAt(0) + '</div>' +
+        '<div class="vendor-list-info">' +
+          '<h3>' + v.nama + ' <span class="badge ' + bc + '">' + v.badge + '</span></h3>' +
+          '<p>📍 ' + v.kota + ' | 💰 ' + v.harga + ' | ⭐ ' + v.rating + '</p>' +
+          '<p>' + v.desc + '</p>' +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+  goTo('kategori-detail');
+}
+
+/* ============ PROFIL VENDOR ============ */
+var currentVendor = null;
+
+function bukaProfil(katId, vId) {
+  var kat = KATEGORI.find(function(k) { return k.id === katId; });
+  if (!kat) return;
+  var v = kat.vendors.find(function(x) { return x.id === vId; });
+  if (!v) return;
+  currentVendor = v;
+
+  var bc = 'badge-' + v.badge.toLowerCase();
+  var portoHtml = '';
+  for (var i = 0; i < 6; i++) portoHtml += '<div>🖼️</div>';
+
+  var ulasan = [
+    { nama: 'Budi', tgl: '15 Des 2026', b: 5, isi: 'Pelayanan bagus, profesional!' },
+    { nama: 'Siti', tgl: '20 Des 2026', b: 5, isi: 'Ramah, tepat waktu!' }
+  ];
+  var uHtml = ulasan.map(function(u) {
+    return '<div class="ulasan-item">' +
+      '<p class="nama">' + u.nama + ' - ' + u.tgl + '</p>' +
+      '<p>' + '⭐'.repeat(u.b) + ' "' + u.isi + '"</p>' +
+      '<button class="tombol-lapor" onclick="lapor()">🚨 Lapor</button>' +
+    '</div>';
+  }).join('');
+
+  document.getElementById('profilContent').innerHTML =
+    '<div class="profil-card">' +
+      '<div class="profil-header">' +
+        '<div class="profil-avatar">' + v.nama.charAt(0) + '</div>' +
+        '<div class="profil-info">' +
+          '<h2>' + v.nama + '</h2>' +
+          '<p><span class="badge ' + bc + '">' + v.badge + '</span> ⭐ ' + v.rating + '</p>' +
+        '</div>' +
+      '</div>' +
+      '<p style="font-size:13px; color:#666; margin-bottom:8px;">📍 ' + v.kota + ' | 💰 Mulai ' + v.harga + '</p>' +
+      '<p style="font-size:13px; color:#666;">' + v.desc + '</p>' +
+      '<div class="tombol">' +
+        '<button class="tombol-wa" onclick="kontakVendor(\'WA\')">📱 WA</button>' +
+        '<button class="tombol-ig" onclick="kontakVendor(\'IG\')">📷 IG</button>' +
+        '<button class="tombol-tiktok" onclick="kontakVendor(\'TikTok\')">🎵 TikTok</button>' +
+      '</div>' +
+    '</div>' +
+    '<div class="form">' +
+      '<h3>📸 Portofolio</h3>' +
+      '<div class="portofolio-grid" id="portoDrive">' + portoHtml + '</div>' +
+      (v.drive ? '<button class="tombol-secondary" style="margin-top:10px;" onclick="window.open(\'' + v.drive + '\',\'_blank\')">📂 Buka Lengkap di Drive</button>' : '') +
+    '</div>' +
+    '<div class="form">' +
+      '<h3>⭐ Ulasan</h3>' +
+      uHtml +
+      '<button class="tombol-primary" style="margin-top:10px;" onclick="bukaUlasan()">Tulis Ulasan</button>' +
+    '</div>';
+
+  goTo('profil');
+
+  setTimeout(function() {
+    var el = document.getElementById('portoDrive');
+    if (!el) return;
+    if (v.drive) {
+      el.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#999;font-size:12px;">Memuat portofolio…</div>';
+      loadDrivePorto(v.drive, el);
+    }
+  }, 60);
+}
+
+/* ============ KONTAK VENDOR ============ */
+var pendingAction = null;
+
+function kontakVendor(aksi) {
+  var noHP = localStorage.getItem('klienNoHP');
+  if (noHP) {
+    doKontak(aksi, noHP);
+  } else {
+    pendingAction = aksi;
+    document.getElementById('modalHP').classList.add('show');
+    document.getElementById('modalNoHP').value = '';
+  }
+}
+
+function closeModal() {
+  document.getElementById('modalHP').classList.remove('show');
+  pendingAction = null;
+}
+
+async function submitModalHP() {
+  var hp = document.getElementById('modalNoHP').value.trim();
+  if (!hp || hp.length < 8) { alert('Isi No HP yang valid dulu ya!'); return; }
+  localStorage.setItem('klienNoHP', hp);
+  document.getElementById('modalHP').classList.remove('show');
+
+  if (window.firebaseReady && currentVendor) {
+    try {
+      await window.addDoc(window.collection(window.db, 'klik'), {
+        noHP: hp, vendor: currentVendor.nama, aksi: pendingAction || 'WA', tanggal: new Date()
+      });
+    } catch(e) { console.warn(e); }
+  }
+
+  var h = JSON.parse(localStorage.getItem('history') || '[]');
+  h.push({
+    vendor: currentVendor ? currentVendor.nama : 'Vendor',
+    tanggal: new Date().toISOString(),
+    noHP: hp,
+    aksi: pendingAction || 'WA'
+  });
+  localStorage.setItem('history', JSON.stringify(h));
+  renderHistory();
+
+  doKontak(pendingAction, hp);
+  pendingAction = null;
+}
+
+function doKontak(aksi, noHP) {
+  if (!currentVendor) return;
+  var v = currentVendor;
+  if (aksi === 'WA') {
+    var p = encodeURIComponent('Halo ' + v.nama + ', saya dari Kreatif ID. Saya tertarik dengan jasa Anda.');
+    window.location.href = 'https://wa.me/' + v.wa + '?text=' + p;
+  } else if (aksi === 'IG') {
+    window.open('https://instagram.com/' + v.nama.toLowerCase().replace(/[^a-z0-9]/g, ''), '_blank');
+  } else if (aksi === 'TikTok') {
+    window.open('https://tiktok.com/@' + v.nama.toLowerCase().replace(/[^a-z0-9]/g, ''), '_blank');
+  }
+}
+
+/* ============ IKLAN ============ */
+var iklan1 = [
+  { nama: 'Ardi Photography', badge: 'TOP', rating: 5.0, kat: 'kreatif-media', id: 'ardi' },
+  { nama: 'Budi Video', badge: 'PRO', rating: 4.7, kat: 'kreatif-media', id: 'budi' }
+];
+var iklan2 = [
+  { nama: 'Sarah MUA', badge: 'TOP', rating: 4.9, kat: 'kecantikan', id: 'sarah' },
+  { nama: 'Dewi WO', badge: 'PRO', rating: 4.6, kat: 'acara-event', id: 'dewi' }
+];
+var iklan3 = [
+  { nama: 'Info Kreatif ID', badge: 'INFO', rating: '-', kat: null, id: null },
+  { nama: 'New Member', badge: 'NEW', rating: '-', kat: null, id: null }
+];
+
+function renderIklan(cid, data) {
+  var c = document.getElementById(cid);
+  if (!c) return;
+  c.innerHTML = data.map(function(item) {
+    var oc = item.kat ? 'onclick="bukaProfil(\'' + item.kat + '\',\'' + item.id + '\')"' : '';
+    var bc = 'badge-' + item.badge.toLowerCase();
+    if (item.badge === 'INFO') bc = 'badge-info';
+    else if (item.badge === 'NEW') bc = 'badge-new';
+    return '<div class="iklan-card" ' + oc + '>' +
+      '<h3>' + item.nama + '</h3>' +
+      '<p><span class="badge ' + bc + '">' + item.badge + '</span> ⭐ ' + item.rating + '</p>' +
+    '</div>';
+  }).join('');
+}
+renderIklan('kolom1', iklan1);
+renderIklan('kolom2', iklan2);
+renderIklan('kolom3', iklan3);
+
+/* ============ SEARCH ============ */
+function doSearch() {
+  var q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+  var res = document.getElementById('searchResult');
+  if (!q) { res.innerHTML = ''; return; }
+  var hasil = [];
+  KATEGORI.forEach(function(kat) {
+    kat.vendors.forEach(function(v) {
+      if (v.nama.toLowerCase().includes(q) || kat.nama.toLowerCase().includes(q) || v.desc.toLowerCase().includes(q)) {
+        hasil.push({ kat: kat.id, v: v });
+      }
+    });
+  });
+  if (!hasil.length) {
+    res.innerHTML = '<p class="empty">Tidak ditemukan. Coba kata lain.</p>';
+    return;
+  }
+  res.innerHTML = hasil.map(function(h) {
+    return '<div class="vendor-list-item" onclick="bukaProfil(\'' + h.kat + '\',\'' + h.v.id + '\')">' +
+      '<div class="vendor-list-avatar">' + h.v.nama.charAt(0) + '</div>' +
+      '<div class="vendor-list-info">' +
+        '<h3>' + h.v.nama + '</h3>' +
+        '<p>📍 ' + h.v.kota + ' | ⭐ ' + h.v.rating + '</p>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+/* ============ HISTORY ============ */
+function renderHistory() {
+  var data = JSON.parse(localStorage.getItem('history') || '[]');
+  var c = document.getElementById('historyList');
+  if (!c) return;
+  if (!data.length) {
+    c.innerHTML = '<div class="form" style="text-align:center; color:#999; font-size:13px;">Belum ada history. Mulai cari jasa dulu ya!</div>';
+    return;
+  }
+  c.innerHTML = data.slice().reverse().map(function(item) {
+    return '<div class="history-item">' +
+      '<h3>' + item.vendor + '</h3>' +
+      '<p>' + new Date(item.tanggal).toLocaleString('id-ID') + ' • ' + (item.aksi || 'klik') + '</p>' +
+      '<button onclick="bukaUlasanDariHistory(\'' + item.vendor.replace(/'/g, "\\'") + '\')">Kasih Ulasan</button>' +
+    '</div>';
   }).join('');
 }
 renderHistory();
 
-/* ===== RATING ===== */
+/* ============ ULASAN ============ */
 var ratingValue = 0;
-function setRating(val) {
-  ratingValue = val;
+
+function setRating(n) {
+  ratingValue = n;
   document.querySelectorAll('#rating span').forEach(function(s, i) {
-    s.classList.toggle('active', i < val);
+    s.classList.toggle('active', i < n);
   });
 }
 
-/* ===== KIRIM ULASAN ===== */
+var currentVendorNama = '';
+
+function bukaUlasan() {
+  if (!currentVendor) return;
+  currentVendorNama = currentVendor.nama;
+  document.getElementById('vendorUlasan').value = currentVendor.nama;
+  document.getElementById('nama').value = localStorage.getItem('klienNama') || '';
+  document.getElementById('noHPUlasan').value = localStorage.getItem('klienNoHP') || '';
+  goTo('ulasan');
+}
+
+function bukaUlasanDariHistory(vendor) {
+  currentVendorNama = vendor;
+  document.getElementById('vendorUlasan').value = vendor;
+  document.getElementById('nama').value = localStorage.getItem('klienNama') || '';
+  document.getElementById('noHPUlasan').value = localStorage.getItem('klienNoHP') || '';
+  goTo('ulasan');
+}
+
 async function kirimUlasan() {
-  var nama = document.getElementById('nama').value;
-  var noHP = document.getElementById('noHPUlasan').value;
-  var email = document.getElementById('email').value;
-  var tanggalAcara = document.getElementById('tanggalAcara').value;
-  var komentar = document.getElementById('komentar').value;
-  if (!nama || !noHP) { alert('Isi nama & No HP!'); return; }
-  if (ratingValue === 0) { alert('Pilih rating!'); return; }
-  try {
-    await window.addDoc(window.collection(window.db, "reviews"), {
-      nama: nama, noHP: noHP, email: email,
-      rating: ratingValue, komentar: komentar,
-      tanggalAcara: tanggalAcara, vendor: "Ardi Photography", createdAt: new Date()
-    });
-    alert('Ulasan terkirim!');
-    goTo('history');
-  } catch (e) { alert('Gagal: ' + e.message); }
+  var nama = document.getElementById('nama').value.trim();
+  var noHP = document.getElementById('noHPUlasan').value.trim();
+  var email = document.getElementById('email').value.trim();
+  var tgl = document.getElementById('tanggalAcara').value;
+  var komentar = document.getElementById('komentar').value.trim();
+  if (!nama || !noHP) { alert('Isi nama & No HP dulu!'); return; }
+  if (ratingValue === 0) { alert('Pilih rating dulu!'); return; }
+  if (window.firebaseReady) {
+    try {
+      await window.addDoc(window.collection(window.db, 'reviews'), {
+        nama: nama, noHP: noHP, email: email,
+        rating: ratingValue, komentar: komentar,
+        tanggalAcara: tgl, vendor: currentVendorNama || 'Vendor',
+        createdAt: new Date()
+      });
+    } catch(e) { console.warn(e); }
+  }
+  localStorage.setItem('klienNama', nama);
+  localStorage.setItem('klienNoHP', noHP);
+  alert('Ulasan terkirim! Terima kasih 🙏');
+  goTo('history');
 }
 
-/* ===== DAFTAR VENDOR ===== */
+/* ============ DAFTAR VENDOR ============ */
 async function daftarVendor() {
-  var nama = document.getElementById('namaUsaha').value;
+  var nama = document.getElementById('namaUsaha').value.trim();
   var kategori = document.getElementById('kategoriDaftar').value;
-  var kota = document.getElementById('kotaDaftar').value;
-  var wa = document.getElementById('waDaftar').value;
-  var harga = document.getElementById('hargaDaftar').value;
+  var kota = document.getElementById('kotaDaftar').value.trim();
+  var wa = document.getElementById('waDaftar').value.trim();
+  var harga = document.getElementById('hargaDaftar').value.trim();
+  var drive = document.getElementById('driveDaftar').value.trim();
   var paket = document.getElementById('paketDaftar').value;
-  if (!nama || !wa) { alert('Isi nama usaha & No WA!'); return; }
-  try {
-    await window.addDoc(window.collection(window.db, "vendors"), {
-      nama: nama, kategori: kategori, kota: kota, wa: wa,
-      harga: harga, paket: paket, badge: "STANDARD", rating: 4.0, createdAt: new Date()
+  var setuju = document.getElementById('setujuDaftar').checked;
+
+  if (!nama || !wa) { alert('Isi Nama Usaha & No WA dulu!'); return; }
+  if (!setuju) { alert('Centang dulu "Setuju dengan ToS & Peraturan" ya!'); return; }
+  if (drive && !drive.includes('drive.google.com')) {
+    if (!confirm('Link bukan Google Drive. Lanjut saja?')) return;
+  }
+
+  var badge = paket === 'GRATIS' ? 'STANDARD' : paket;
+  if (window.firebaseReady) {
+    try {
+      await window.addDoc(window.collection(window.db, 'vendors'), {
+        nama: nama, kategori: kategori, kota: kota, wa: wa,
+        harga: harga, drive: drive, paket: paket,
+        badge: badge, rating: 4.0, createdAt: new Date()
+      });
+    } catch(e) { console.warn(e); }
+  }
+
+  // Tambah ke daftar lokal supaya langsung tampil
+  var kat = KATEGORI.find(function(k) { return k.id === kategori; });
+  if (kat) {
+    kat.vendors.push({
+      id: 'v' + Date.now(),
+      nama: nama, kota: kota, harga: harga || 'Hubungi',
+      rating: 4.0, badge: badge, desc: 'Vendor baru terdaftar.',
+      wa: wa.replace(/[^0-9]/g, ''), drive: drive
     });
-    alert('Pendaftaran berhasil!');
-    goTo('home');
-  } catch (e) { alert('Gagal: ' + e.message); }
+  }
+
+  goTo('sukses-daftar');
 }
 
-/* ===== LAPOR ===== */
+/* ============ LAPOR ============ */
 function lapor() {
-  var alasan = prompt('Alasan lapor:\n1. Plagiat\n2. Konten tidak pantas\n3. SARA\n4. Penipuan');
-  if (alasan) alert('Laporan terkirim! Admin akan verifikasi 3x24 jam.');
+  var a = prompt('Alasan lapor:\n1. Plagiat\n2. Konten tidak pantas\n3. SARA\n4. Penipuan');
+  if (a) alert('Laporan terkirim! Admin verifikasi 3×24 jam.');
 }
-</script>
 
+/* ============ USER PROFILE ============ */
+function refreshUser() {
+  var nama = localStorage.getItem('klienNama') || '';
+  var hp = localStorage.getItem('klienNoHP') || '';
+  document.getElementById('userNama').textContent = nama || 'Belum diisi';
+  document.getElementById('userHP').textContent = 'No HP: ' + (hp || '-');
+  document.getElementById('userAvatar').textContent = nama ? nama.charAt(0).toUpperCase() : '?';
+  document.getElementById('inputUserNama').value = nama;
+  document.getElementById('inputUserHP').value = hp;
+}
+
+function simpanUser() {
+  var nama = document.getElementById('inputUserNama').value.trim();
+  var hp = document.getElementById('inputUserHP').value.trim();
+  if (nama) localStorage.setItem('klienNama', nama);
+  if (hp) localStorage.setItem('klienNoHP', hp);
+  refreshUser();
+  alert('Data tersimpan!');
+}
+
+function clearUser() {
+  if (!confirm('Hapus semua data lokal?')) return;
+  localStorage.removeItem('klienNama');
+  localStorage.removeItem('klienNoHP');
+  localStorage.removeItem('history');
+  refreshUser();
+  renderHistory();
+  alert('Data dihapus.');
+}
+
+refreshUser();
+</script>
 </body>
 </html>
