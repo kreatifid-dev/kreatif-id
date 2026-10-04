@@ -7,403 +7,242 @@
 <meta name="description" content="Cari jasa fotografer, videografer, MUA, MC, WO, dan lainnya di Kreatif ID">
 <meta name="theme-color" content="#4A90E2">
 <link rel="manifest" href="manifest.json">
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAUrQNYsj5o6CZLR1o48AeJHUShMEZetJA",
+    authDomain: "kreatif-id-709c5.firebaseapp.com",
+    projectId: "kreatif-id-709c5",
+    storageBucket: "kreatif-id-709c5.firebasestorage.app",
+    messagingSenderId: "152029874076",
+    appId: "1:152029874076:web:02d46ba94093291ff42a59"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  window.db = db;
+  window.addDoc = addDoc;
+  window.collection = collection;
+</script>
+
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #f5f7fa;
-    color: #2c3e50;
-    line-height: 1.6;
+    background: #f5f7fa; color: #2c3e50; line-height: 1.6;
     padding-bottom: 80px;
   }
   .page { display: none; padding: 16px; }
   .page.active { display: block; }
 
-  /* SPLASH */
   #splash {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: center;
+    align-items: center; min-height: 100vh;
     background: linear-gradient(135deg, #4A90E2, #357ABD);
-    color: white;
-    text-align: center;
-    padding: 20px;
+    color: white; text-align: center; padding: 20px;
   }
   #splash h1 { font-size: 48px; margin-bottom: 16px; }
   #splash p { font-size: 16px; opacity: 0.9; }
   .loading {
-    margin-top: 32px;
-    width: 200px;
-    height: 4px;
-    background: rgba(255,255,255,0.3);
-    border-radius: 2px;
-    overflow: hidden;
+    margin-top: 32px; width: 200px; height: 4px;
+    background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden;
   }
   .loading-bar {
-    width: 0%;
-    height: 100%;
-    background: white;
+    width: 0%; height: 100%; background: white;
     animation: loading 2s ease-in-out forwards;
   }
-  @keyframes loading {
-    from { width: 0%; }
-    to { width: 100%; }
-  }
+  @keyframes loading { from { width: 0%; } to { width: 100%; } }
 
-  /* ONBOARDING */
   #onboarding {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 100vh;
-    max-width: 400px;
-    margin: 0 auto;
-    text-align: center;
+    display: flex; flex-direction: column; justify-content: center;
+    min-height: 100vh; max-width: 400px; margin: 0 auto;
+    text-align: center; padding: 20px;
   }
   #onboarding h1 { font-size: 32px; color: #4A90E2; margin-bottom: 16px; }
   #onboarding p { font-size: 16px; color: #666; margin-bottom: 24px; }
   #onboarding ul { text-align: left; list-style: none; margin-bottom: 24px; }
   #onboarding li {
-    padding: 12px;
-    background: white;
-    border-radius: 12px;
-    margin-bottom: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    font-size: 14px;
+    padding: 12px; background: white; border-radius: 12px;
+    margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); font-size: 14px;
   }
 
-  /* INFO */
-  #info {
-    max-width: 500px;
-    margin: 0 auto;
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  #pilih-peran {
+    display: flex; flex-direction: column; justify-content: center;
+    min-height: 100vh; max-width: 400px; margin: 0 auto;
+    text-align: center; padding: 20px;
   }
-  #info h1 { font-size: 22px; color: #4A90E2; margin-bottom: 16px; text-align: center; }
-  #info ul { list-style: none; margin-bottom: 16px; }
-  #info li {
-    padding: 10px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    font-size: 14px;
+  #pilih-peran h1 { font-size: 24px; color: #4A90E2; margin-bottom: 24px; }
+  .peran-btn {
+    display: block; width: 100%; padding: 20px; border-radius: 16px;
+    border: none; font-size: 18px; font-weight: 700; cursor: pointer;
+    margin-bottom: 16px; color: white;
   }
-  .warning {
-    background: #fff9e5;
-    border-left: 4px solid #f39c12;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 16px;
-    font-size: 14px;
-  }
+  .peran-vendor { background: #4A90E2; }
+  .peran-klien { background: #27ae60; }
 
-  /* HEADER */
   header {
-    background: white;
-    padding: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    background: white; padding: 16px; display: flex;
+    justify-content: space-between; align-items: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    position: sticky;
-    top: 0;
-    z-index: 100;
+    position: sticky; top: 0; z-index: 100;
   }
   header h1 { font-size: 20px; color: #4A90E2; }
   header nav a {
-    margin-left: 12px;
-    color: #4A90E2;
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 600;
+    margin-left: 12px; color: #4A90E2; text-decoration: none;
+    font-size: 14px; font-weight: 600;
   }
 
-  /* KOLOM IKLAN */
   .kolom { padding: 16px; }
   .kolom h2 { font-size: 16px; color: #4A90E2; margin-bottom: 12px; }
-  .iklan-container {
-    display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    padding-bottom: 8px;
-  }
+  .iklan-container { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; }
   .iklan-card {
-    min-width: 200px;
-    background: white;
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    min-width: 200px; background: white; border-radius: 12px;
+    padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
   .iklan-card h3 { font-size: 14px; margin-bottom: 4px; }
   .iklan-card p { font-size: 12px; color: #666; }
 
-  /* KATEGORI */
-  .kategori { padding: 16px; }
-  .kategori h2 { font-size: 16px; color: #4A90E2; margin-bottom: 12px; }
   .kategori-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    display: grid; grid-template-columns: repeat(2, 1fr);
+    gap: 12px; padding: 16px;
   }
   .kategori-grid a {
-    padding: 16px;
-    background: white;
-    border-radius: 12px;
-    text-decoration: none;
-    color: #2c3e50;
-    font-size: 14px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    text-align: center;
+    padding: 16px; background: white; border-radius: 12px;
+    text-decoration: none; color: #2c3e50; font-size: 14px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center;
   }
 
-  /* PROFIL */
   .profil-card {
-    background: white;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    margin-bottom: 16px;
+    background: white; border-radius: 16px; padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 16px;
   }
-  .profil-header {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 16px;
-  }
+  .profil-header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
   .profil-avatar {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: #4A90E2;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 24px;
-    font-weight: 700;
+    width: 64px; height: 64px; border-radius: 50%;
+    background: #4A90E2; display: flex; align-items: center;
+    justify-content: center; color: white; font-size: 24px; font-weight: 700;
   }
   .profil-info h2 { font-size: 20px; margin-bottom: 4px; }
   .profil-info p { font-size: 14px; color: #666; }
   .badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
+    display: inline-block; padding: 4px 12px; border-radius: 12px;
+    font-size: 12px; font-weight: 600;
   }
   .badge-verified { background: #e5f0ff; color: #4A90E2; }
   .badge-pro { background: #e5f5e5; color: #27ae60; }
   .badge-top { background: #fff5e5; color: #e67e22; }
   .badge-standard { background: #f0f0f0; color: #666; }
 
-  /* TOMBOL */
-  .tombol {
-    display: flex;
-    gap: 12px;
-    margin-top: 16px;
-  }
-  .tombol a, .tombol button {
-    flex: 1;
-    padding: 14px;
-    border-radius: 12px;
-    text-align: center;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 14px;
-    border: none;
-    cursor: pointer;
+  .tombol { display: flex; gap: 12px; margin-top: 16px; }
+  .tombol button {
+    flex: 1; padding: 14px; border-radius: 12px;
+    text-align: center; font-weight: 600; font-size: 14px;
+    border: none; cursor: pointer;
   }
   .tombol-wa { background: #25D366; color: white; }
   .tombol-ig { background: #E1306C; color: white; }
   .tombol-tiktok { background: #000; color: white; }
-  .tombol-primary { background: #4A90E2; color: white; width: 100%; }
-  .tombol-danger { background: #d63031; color: white; }
-  .tombol-warning { background: #f39c12; color: white; }
-
-  /* PORTOFOLIO */
-  .portofolio {
-    background: white;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    margin-bottom: 16px;
+  .tombol-primary {
+    width: 100%; padding: 14px; background: #4A90E2; color: white;
+    border: none; border-radius: 12px; font-size: 16px;
+    font-weight: 600; cursor: pointer;
   }
-  .portofolio h3 { font-size: 16px; margin-bottom: 12px; }
+  .tombol-danger {
+    width: 100%; padding: 14px; background: #d63031; color: white;
+    border: none; border-radius: 12px; font-size: 16px;
+    font-weight: 600; cursor: pointer; margin-top: 12px;
+  }
+  .tombol-lapor {
+    display: inline-block; padding: 6px 12px; background: #ffe5e5;
+    color: #d63031; border-radius: 8px; font-size: 12px;
+    border: none; cursor: pointer; margin-top: 8px;
+  }
+
   .portofolio-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
   }
   .portofolio-grid div {
-    aspect-ratio: 1;
-    background: #e8f0fe;
-    border-radius: 8px;
+    aspect-ratio: 1; background: #e8f0fe; border-radius: 8px;
   }
 
-  /* ULASAN */
-  .ulasan {
-    background: white;
-    border-radius: 16px;
-    padding: 20px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-  }
-  .ulasan h3 { font-size: 16px; margin-bottom: 12px; }
   .ulasan-item {
-    padding: 12px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    font-size: 14px;
+    padding: 12px; background: #f8f9fa; border-radius: 8px;
+    margin-bottom: 8px; font-size: 14px;
   }
   .ulasan-item .nama { font-weight: 600; }
   .ulasan-item .hp { font-size: 12px; color: #999; }
 
-  /* FORM */
   .form {
-    max-width: 500px;
-    margin: 0 auto;
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
+    max-width: 500px; margin: 0 auto; background: white;
+    border-radius: 16px; padding: 24px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
-  .form h1 {
-    font-size: 20px;
-    color: #4A90E2;
-    margin-bottom: 16px;
-    text-align: center;
-  }
-  .form label {
-    display: block;
-    font-size: 14px;
-    font-weight: 600;
-    margin-bottom: 4px;
-  }
+  .form h1 { font-size: 20px; color: #4A90E2; margin-bottom: 16px; text-align: center; }
+  .form label { display: block; font-size: 14px; font-weight: 600; margin-bottom: 4px; }
   .form input, .form textarea, .form select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 14px;
-    margin-bottom: 16px;
+    width: 100%; padding: 12px; border: 1px solid #ddd;
+    border-radius: 8px; font-size: 14px; margin-bottom: 16px;
   }
-  .form .note {
-    font-size: 12px;
-    color: #999;
-    margin-top: 12px;
-    text-align: center;
-  }
+  .form .note { font-size: 12px; color: #999; margin-top: 12px; text-align: center; }
 
-  /* RATING */
-  .rating {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-    font-size: 24px;
-    cursor: pointer;
-  }
+  .rating { display: flex; gap: 8px; margin-bottom: 16px; font-size: 24px; cursor: pointer; }
   .rating span { color: #ddd; }
   .rating span.active { color: #f39c12; }
 
-  /* BOTTOM NAV */
   .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: white;
-    display: flex;
-    justify-content: space-around;
-    padding: 12px;
-    box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
-    z-index: 100;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: white; display: flex; justify-content: space-around;
+    padding: 12px; box-shadow: 0 -2px 8px rgba(0,0,0,0.06); z-index: 100;
   }
   .bottom-nav a {
-    text-decoration: none;
-    color: #999;
-    font-size: 12px;
-    text-align: center;
+    text-decoration: none; color: #999; font-size: 12px; text-align: center;
   }
   .bottom-nav a.active { color: #4A90E2; }
 
-  /* FOOTER */
   footer {
-    padding: 20px;
-    text-align: center;
-    color: #999;
-    font-size: 12px;
+    padding: 20px; text-align: center; color: #999; font-size: 12px;
   }
   footer nav a {
-    margin: 0 8px;
-    color: #4A90E2;
-    text-decoration: none;
+    margin: 0 8px; color: #4A90E2; text-decoration: none;
   }
 
-  /* HISTORY */
   .history-item {
-    background: white;
-    border-radius: 12px;
-    padding: 16px;
-    margin-bottom: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    background: white; border-radius: 12px; padding: 16px;
+    margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
   }
   .history-item h3 { font-size: 16px; margin-bottom: 4px; }
   .history-item p { font-size: 14px; color: #666; margin-bottom: 8px; }
   .history-item a {
-    display: inline-block;
-    padding: 8px 16px;
-    background: #4A90E2;
-    color: white;
-    border-radius: 8px;
-    text-decoration: none;
-    font-size: 14px;
+    display: inline-block; padding: 8px 16px; background: #4A90E2;
+    color: white; border-radius: 8px; text-decoration: none; font-size: 14px;
   }
 
-  /* DOKUMEN */
   .dokumen {
-    max-width: 600px;
-    margin: 0 auto;
-    background: white;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-    font-size: 14px;
+    max-width: 600px; margin: 0 auto; background: white;
+    border-radius: 16px; padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); font-size: 14px;
   }
   .dokumen h1 { font-size: 20px; color: #4A90E2; margin-bottom: 16px; }
   .dokumen h2 { font-size: 16px; color: #2c3e50; margin: 16px 0 8px; }
   .dokumen p { margin-bottom: 8px; }
   .dokumen ul { padding-left: 20px; margin-bottom: 8px; }
   .dokumen li { margin-bottom: 4px; }
-
-  /* TOMBOL LAPOR */
-  .tombol-lapor {
-    display: inline-block;
-    padding: 6px 12px;
-    background: #ffe5e5;
-    color: #d63031;
-    border-radius: 8px;
-    font-size: 12px;
-    text-decoration: none;
-    margin-top: 8px;
-    border: none;
-    cursor: pointer;
-  }
 </style>
 </head>
 <body>
 
-<!-- ================= SPLASH ================= -->
+<!-- SPLASH -->
 <div id="splash" class="page active">
   <h1>🎨 Kreatif ID</h1>
   <p>Platform Jasa Indonesia</p>
   <div class="loading"><div class="loading-bar"></div></div>
 </div>
 
-<!-- ================= ONBOARDING ================= -->
+<!-- ONBOARDING -->
 <div id="onboarding" class="page">
   <h1>🎨 Kreatif ID</h1>
   <p>Platform yang menghubungkan Anda dengan vendor jasa di seluruh Indonesia.</p>
@@ -413,10 +252,17 @@
     <li>✅ Beri ulasan untuk vendor</li>
     <li>✅ 12 Kategori, 191 Jasa</li>
   </ul>
-  <button class="tombol-primary" onclick="showPage('info')">Lanjut</button>
+  <button class="tombol-primary" onclick="showPage('pilih-peran')">Lanjut</button>
 </div>
 
-<!-- ================= INFO AWAL ================= -->
+<!-- PILIH PERAN -->
+<div id="pilih-peran" class="page">
+  <h1>Pilih Peran Anda</h1>
+  <button class="peran-btn peran-vendor" onclick="showPage('daftar')">Saya Vendor</button>
+  <button class="peran-btn peran-klien" onclick="showPage('info')">Saya Klien</button>
+</div>
+
+<!-- INFO AWAL -->
 <div id="info" class="page">
   <div class="form">
     <h1>ℹ️ INFORMASI PENTING</h1>
@@ -429,21 +275,20 @@
       <li style="padding: 10px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-size: 14px;">✅ Kreatif ID TIDAK pegang uang</li>
       <li style="padding: 10px; background: #f8f9fa; border-radius: 8px; margin-bottom: 8px; font-size: 14px;">✅ Kreatif ID TIDAK menjamin kualitas servis</li>
     </ul>
-    <div class="warning">
+    <div style="background: #fff9e5; border-left: 4px solid #f39c12; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px;">
       ⚠️ Jika servis vendor kurang bagus, silakan berikan ulasan di profil vendor agar jadi bahan pertimbangan klien lain.
     </div>
     <button class="tombol-primary" onclick="showPage('home')">Saya Mengerti</button>
   </div>
 </div>
 
-<!-- ================= HOME ================= -->
+<!-- HOME -->
 <div id="home" class="page">
   <header>
     <h1>🎨 Kreatif ID</h1>
     <nav>
       <a href="#" onclick="showPage('kategori')">Kategori</a>
       <a href="#" onclick="showPage('daftar')">Daftar</a>
-      <a href="#" onclick="showPage('login')">Login</a>
     </nav>
   </header>
 
@@ -463,7 +308,7 @@
   </section>
 
   <section class="kategori">
-    <h2>📂 Kategori Jasa</h2>
+    <h2 style="font-size: 16px; color: #4A90E2; margin-bottom: 12px; padding: 0 16px;">📂 Kategori Jasa</h2>
     <div class="kategori-grid">
       <a href="#" onclick="showPage('profil')">🎨 Kreatif & Media</a>
       <a href="#" onclick="showPage('profil')">🎉 Acara & Event</a>
@@ -493,7 +338,29 @@
   </footer>
 </div>
 
-<!-- ================= PROFIL ================= -->
+<!-- KATEGORI -->
+<div id="kategori" class="page">
+  <header>
+    <h1>📂 Kategori</h1>
+    <nav><a href="#" onclick="showPage('home')">← Kembali</a></nav>
+  </header>
+  <div class="kategori-grid">
+    <a href="#" onclick="showPage('profil')">🎨 Kreatif & Media</a>
+    <a href="#" onclick="showPage('profil')">🎉 Acara & Event</a>
+    <a href="#" onclick="showPage('profil')">💄 Kecantikan</a>
+    <a href="#" onclick="showPage('profil')">🏠 Rumah & Bangunan</a>
+    <a href="#" onclick="showPage('profil')">📚 Pendidikan</a>
+    <a href="#" onclick="showPage('profil')">💪 Kesehatan</a>
+    <a href="#" onclick="showPage('profil')">💻 Digital</a>
+    <a href="#" onclick="showPage('profil')">🚗 Transport</a>
+    <a href="#" onclick="showPage('profil')">🍽️ Kuliner</a>
+    <a href="#" onclick="showPage('profil')">🔧 Otomotif</a>
+    <a href="#" onclick="showPage('profil')">🆕 Amal & Sosial</a>
+    <a href="#" onclick="showPage('profil')">🆕 Jasa Lainnya</a>
+  </div>
+</div>
+
+<!-- PROFIL -->
 <div id="profil" class="page">
   <a href="#" onclick="showPage('home')" style="color: #4A90E2; text-decoration: none; font-size: 14px;">← Kembali</a>
   <div class="profil-card" style="margin-top: 16px;">
@@ -508,12 +375,12 @@
     <p style="font-size: 14px; color: #666;">Fotografer wedding & prewedding. Berpengalaman 5 tahun.</p>
     <div class="tombol">
       <button class="tombol-wa" onclick="showPage('isi-hp')">📱 WA</button>
-      <a href="#" class="tombol-ig">📷 IG</a>
-      <a href="#" class="tombol-tiktok">🎵 TikTok</a>
+      <button class="tombol-ig" onclick="catatKlik('IG')">📷 IG</button>
+      <button class="tombol-tiktok" onclick="catatKlik('TikTok')">🎵 TikTok</button>
     </div>
   </div>
 
-  <div class="portofolio">
+  <div class="form" style="margin-bottom: 16px;">
     <h3>📸 Portofolio</h3>
     <div class="portofolio-grid">
       <div></div><div></div><div></div>
@@ -522,26 +389,24 @@
     </div>
   </div>
 
-  <div class="ulasan">
+  <div class="form">
     <h3>⭐ Ulasan (25)</h3>
     <div class="ulasan-item">
       <p class="nama">Budi - 15 Des 2026</p>
       <p>⭐⭐⭐⭐⭐ "Fotonya bagus, profesional!"</p>
       <p class="hp">📱 0812-xxxx-7890</p>
-      <p style="font-size: 12px; color: #27ae60;">✅ Terverifikasi</p>
       <button class="tombol-lapor" onclick="lapor()">🚨 Lapor</button>
     </div>
     <div class="ulasan-item">
       <p class="nama">Siti - 20 Des 2026</p>
       <p>⭐⭐⭐⭐⭐ "Ramah, tepat waktu!"</p>
       <p class="hp">📱 0813-xxxx-4567</p>
-      <p style="font-size: 12px; color: #27ae60;">✅ Terverifikasi</p>
       <button class="tombol-lapor" onclick="lapor()">🚨 Lapor</button>
     </div>
   </div>
 </div>
 
-<!-- ================= ISI NO HP ================= -->
+<!-- ISI NO HP -->
 <div id="isi-hp" class="page">
   <div class="form">
     <h1>📝 Isi No HP Anda</h1>
@@ -553,15 +418,13 @@
   </div>
 </div>
 
-<!-- ================= HISTORY ================= -->
+<!-- HISTORY -->
 <div id="history" class="page">
-  <header>
-    <h1>📋 History Anda</h1>
-  </header>
+  <header><h1>📋 History Anda</h1></header>
   <div id="historyList" style="padding: 16px;"></div>
 </div>
 
-<!-- ================= ULASAN ================= -->
+<!-- ULASAN -->
 <div id="ulasan" class="page">
   <div class="form">
     <h1>⭐ Kasih Ulasan</h1>
@@ -590,21 +453,7 @@
   </div>
 </div>
 
-<!-- ================= SANGGahan ================= -->
-<div id="sanggahan" class="page">
-  <div class="form">
-    <h1>🛡️ Sanggahan Ulasan</h1>
-    <p style="font-size: 14px; color: #666; margin-bottom: 16px;">Ulasan dari: Budi | Rating: ⭐ (1/5)</p>
-    <label>Alasan Sanggahan</label>
-    <textarea id="alasanSanggahan" rows="4" placeholder="Tulis alasan sanggahan..."></textarea>
-    <label>Bukti (opsional)</label>
-    <input type="file" id="buktiSanggahan">
-    <button class="tombol-primary" onclick="kirimSanggahan()">Kirim Sanggahan</button>
-    <p class="note">*Admin akan verifikasi dalam 3x24 jam</p>
-  </div>
-</div>
-
-<!-- ================= DAFTAR ================= -->
+<!-- DAFTAR -->
 <div id="daftar" class="page">
   <div class="form">
     <h1>📝 Daftar Vendor</h1>
@@ -638,20 +487,7 @@
   </div>
 </div>
 
-<!-- ================= LOGIN ================= -->
-<div id="login" class="page">
-  <div class="form">
-    <h1>🔐 Login</h1>
-    <label>Email</label>
-    <input type="email" id="loginEmail" placeholder="email@example.com">
-    <label>Password</label>
-    <input type="password" id="loginPassword" placeholder="Password">
-    <button class="tombol-primary" onclick="login()">Login</button>
-    <p class="note">Belum punya akun? <a href="#" onclick="showPage('daftar')" style="color: #4A90E2;">Daftar</a></p>
-  </div>
-</div>
-
-<!-- ================= PRIVACY ================= -->
+<!-- PRIVACY -->
 <div id="privacy" class="page">
   <div class="dokumen">
     <h1>🔒 Privacy Policy</h1>
@@ -698,7 +534,7 @@
   </div>
 </div>
 
-<!-- ================= TOS ================= -->
+<!-- TOS -->
 <div id="tos" class="page">
   <div class="dokumen">
     <h1>📜 Syarat & Ketentuan</h1>
@@ -744,7 +580,7 @@
   </div>
 </div>
 
-<!-- ================= DISCLAIMER ================= -->
+<!-- DISCLAIMER -->
 <div id="disclaimer" class="page">
   <div class="dokumen">
     <h1>⚠️ Disclaimer</h1>
@@ -761,7 +597,7 @@
   </div>
 </div>
 
-<!-- ================= TENTANG ================= -->
+<!-- TENTANG -->
 <div id="tentang" class="page">
   <div class="dokumen">
     <h1>🎨 Tentang Kreatif ID</h1>
@@ -780,7 +616,7 @@
   </div>
 </div>
 
-<!-- ================= FAQ ================= -->
+<!-- FAQ -->
 <div id="faq" class="page">
   <div class="dokumen">
     <h1>❓ FAQ</h1>
@@ -796,7 +632,7 @@
   </div>
 </div>
 
-<!-- ================= KONTAK ================= -->
+<!-- KONTAK -->
 <div id="kontak" class="page">
   <div class="dokumen">
     <h1>📞 Kontak</h1>
@@ -808,64 +644,26 @@
   </div>
 </div>
 
-<!-- ================= KATEGORI ================= -->
-<div id="kategori" class="page">
-  <header>
-    <h1>📂 Kategori</h1>
-    <nav><a href="#" onclick="showPage('home')">← Kembali</a></nav>
-  </header>
-  <div class="kategori" style="padding: 16px;">
-    <div class="kategori-grid">
-      <a href="#" onclick="showPage('profil')">🎨 Kreatif & Media</a>
-      <a href="#" onclick="showPage('profil')">🎉 Acara & Event</a>
-      <a href="#" onclick="showPage('profil')">💄 Kecantikan</a>
-      <a href="#" onclick="showPage('profil')">🏠 Rumah & Bangunan</a>
-      <a href="#" onclick="showPage('profil')">📚 Pendidikan</a>
-      <a href="#" onclick="showPage('profil')">💪 Kesehatan</a>
-      <a href="#" onclick="showPage('profil')">💻 Digital</a>
-      <a href="#" onclick="showPage('profil')">🚗 Transport</a>
-      <a href="#" onclick="showPage('profil')">🍽️ Kuliner</a>
-      <a href="#" onclick="showPage('profil')">🔧 Otomotif</a>
-      <a href="#" onclick="showPage('profil')">🆕 Amal & Sosial</a>
-      <a href="#" onclick="showPage('profil')">🆕 Jasa Lainnya</a>
-    </div>
-  </div>
-</div>
-
-<!-- ================= CARI ================= -->
-<div id="cari" class="page">
-  <header>
-    <h1>🔍 Cari</h1>
-    <nav><a href="#" onclick="showPage('home')">← Kembali</a></nav>
-  </header>
-  <div class="form" style="margin-top: 16px;">
-    <input type="text" placeholder="Cari jasa...">
-    <button class="tombol-primary" onclick="showPage('profil')">Cari</button>
-  </div>
-</div>
-
-<!-- ================= BOTTOM NAV ================= -->
+<!-- BOTTOM NAV -->
 <nav class="bottom-nav">
   <a href="#" onclick="showPage('home')" class="active">🏠 Home</a>
-  <a href="#" onclick="showPage('cari')">🔍 Cari</a>
+  <a href="#" onclick="showPage('profil')">🔍 Cari</a>
   <a href="#" onclick="showPage('history')">📋 History</a>
-  <a href="#" onclick="showPage('profil')">👤 Profil</a>
+  <a href="#" onclick="showPage('ulasan')">👤 Profil</a>
 </nav>
 
 <script>
-// ========== NAVIGASI ==========
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
 }
 
-// ========== SPLASH ==========
 setTimeout(() => {
-  showPage('onboarding');
-}, 2500);
+  document.getElementById('splash').classList.remove('active');
+  document.getElementById('onboarding').classList.add('active');
+}, 2000);
 
-// ========== IKLAN ==========
 const iklanKolom1 = [
   { nama: 'Ardi Photography', badge: 'TOP', rating: 5.0 },
   { nama: 'Budi Video', badge: 'PRO', rating: 4.7 }
@@ -889,27 +687,34 @@ function renderIklan(containerId, data) {
     </div>
   `).join('');
 }
-
 renderIklan('kolom1', iklanKolom1);
 renderIklan('kolom2', iklanKolom2);
 renderIklan('kolom3', iklanKolom3);
 
-// ========== ISI NO HP ==========
-function simpanHP() {
+async function simpanHP() {
   const noHP = document.getElementById('noHP').value;
   if (!noHP) { alert('Isi No HP dulu!'); return; }
-  localStorage.setItem('klienNoHP', noHP);
-  const history = JSON.parse(localStorage.getItem('history') || '[]');
-  history.push({
-    vendor: 'Ardi Photography',
-    tanggal: new Date().toISOString(),
-    noHP: noHP
-  });
-  localStorage.setItem('history', JSON.stringify(history));
-  window.location.href = 'https://wa.me/6281234567890';
+  try {
+    await window.addDoc(window.collection(window.db, "klien"), {
+      noHP: noHP, vendor: "Ardi Photography", tanggal: new Date()
+    });
+    const history = JSON.parse(localStorage.getItem('history') || '[]');
+    history.push({ vendor: 'Ardi Photography', tanggal: new Date().toISOString(), noHP: noHP });
+    localStorage.setItem('history', JSON.stringify(history));
+    window.location.href = 'https://wa.me/6281234567890';
+  } catch (e) { alert('Gagal: ' + e.message); }
 }
 
-// ========== HISTORY ==========
+async function catatKlik(aksi) {
+  const noHP = localStorage.getItem('klienNoHP') || 'tidak diketahui';
+  try {
+    await window.addDoc(window.collection(window.db, "klik"), {
+      noHP: noHP, vendor: "Ardi Photography", aksi: aksi, tanggal: new Date()
+    });
+    alert('Klik ' + aksi + ' tercatat!');
+  } catch (e) { alert('Gagal: ' + e.message); }
+}
+
 function renderHistory() {
   const history = JSON.parse(localStorage.getItem('history') || '[]');
   const container = document.getElementById('historyList');
@@ -928,7 +733,6 @@ function renderHistory() {
 }
 renderHistory();
 
-// ========== ULASAN ==========
 let ratingValue = 0;
 function setRating(val) {
   ratingValue = val;
@@ -937,63 +741,48 @@ function setRating(val) {
   });
 }
 
-function kirimUlasan() {
-  const ulasan = {
-    vendor: document.getElementById('vendor').value,
-    nama: document.getElementById('nama').value,
-    noHP: document.getElementById('noHPUlasan').value,
-    email: document.getElementById('email').value,
-    tanggalAcara: document.getElementById('tanggalAcara').value,
-    rating: ratingValue,
-    komentar: document.getElementById('komentar').value,
-    createdAt: new Date().toISOString()
-  };
-  if (!ulasan.nama || !ulasan.noHP || !ulasan.rating) {
-    alert('Isi nama, No HP, dan rating!');
-    return;
-  }
-  const ulasanList = JSON.parse(localStorage.getItem('ulasan') || '[]');
-  ulasanList.push(ulasan);
-  localStorage.setItem('ulasan', JSON.stringify(ulasanList));
-  alert('Ulasan terkirim!');
-  showPage('history');
+async function kirimUlasan() {
+  const nama = document.getElementById('nama').value;
+  const noHP = document.getElementById('noHPUlasan').value;
+  const email = document.getElementById('email').value;
+  const tanggalAcara = document.getElementById('tanggalAcara').value;
+  const komentar = document.getElementById('komentar').value;
+  if (!nama || !noHP) { alert('Isi nama & No HP!'); return; }
+  if (ratingValue === 0) { alert('Pilih rating!'); return; }
+  try {
+    await window.addDoc(window.collection(window.db, "reviews"), {
+      nama: nama, noHP: noHP, email: email,
+      rating: ratingValue, komentar: komentar,
+      tanggalAcara: tanggalAcara, vendor: "Ardi Photography", createdAt: new Date()
+    });
+    alert('Ulasan terkirim!');
+    showPage('history');
+  } catch (e) { alert('Gagal: ' + e.message); }
 }
 
-// ========== SANGGahan ==========
-function kirimSanggahan() {
-  const alasan = document.getElementById('alasanSanggahan').value;
-  if (!alasan) { alert('Isi alasan sanggahan!'); return; }
-  alert('Sanggahan terkirim! Admin akan verifikasi 3x24 jam.');
-  showPage('profil');
-}
-
-// ========== DAFTAR ==========
-function daftarVendor() {
+async function daftarVendor() {
   const nama = document.getElementById('namaUsaha').value;
+  const kategori = document.getElementById('kategoriDaftar').value;
+  const kota = document.getElementById('kotaDaftar').value;
   const wa = document.getElementById('waDaftar').value;
-  if (!nama || !wa) { alert('Isi nama usaha dan No WA!'); return; }
-  alert('Pendaftaran berhasil! Silakan cek WA untuk verifikasi.');
-  showPage('home');
+  const harga = document.getElementById('hargaDaftar').value;
+  const paket = document.getElementById('paketDaftar').value;
+  if (!nama || !wa) { alert('Isi nama usaha & No WA!'); return; }
+  try {
+    await window.addDoc(window.collection(window.db, "vendors"), {
+      nama: nama, kategori: kategori, kota: kota, wa: wa,
+      harga: harga, paket: paket, badge: "STANDARD", rating: 4.0, createdAt: new Date()
+    });
+    alert('Pendaftaran berhasil!');
+    showPage('home');
+  } catch (e) { alert('Gagal: ' + e.message); }
 }
 
-// ========== LOGIN ==========
-function login() {
-  const email = document.getElementById('loginEmail').value;
-  const pass = document.getElementById('loginPassword').value;
-  if (!email || !pass) { alert('Isi email dan password!'); return; }
-  alert('Login berhasil!');
-  showPage('home');
-}
-
-// ========== LAPOR ==========
 function lapor() {
   const alasan = prompt('Alasan lapor:\n1. Plagiat\n2. Konten tidak pantas\n3. SARA\n4. Penipuan');
-  if (alasan) {
-    alert('Laporan terkirim! Admin akan verifikasi 3x24 jam.');
-  }
+  if (alasan) alert('Laporan terkirim! Admin akan verifikasi 3x24 jam.');
 }
 
-// ========== HAPUS AKUN ==========
 function hapusAkun() {
   if (confirm('Anda yakin? Semua data akan dihapus permanen.')) {
     localStorage.clear();
