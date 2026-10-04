@@ -2,9 +2,8 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kreatif ID - Platform Jasa Indonesia</title>
-<meta name="description" content="Cari jasa fotografer, videografer, MUA, MC, WO, dan lainnya di Kreatif ID">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Kreatif ID</title>
 <meta name="theme-color" content="#4A90E2">
 <link rel="manifest" href="manifest.json">
 
@@ -20,31 +19,56 @@
     messagingSenderId: "152029874076",
     appId: "1:152029874076:web:02d46ba94093291ff42a59"
   };
-
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-
   window.db = db;
   window.addDoc = addDoc;
   window.collection = collection;
 </script>
 
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body {
+    height: 100%; overflow: hidden;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: #f5f7fa; color: #2c3e50; line-height: 1.6;
-    padding-bottom: 80px;
   }
-  .page { display: none; padding: 16px; }
-  .page.active { display: block; }
+  .app {
+    position: relative; width: 100%; height: 100vh;
+    overflow: hidden;
+  }
+  .page {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    overflow-y: auto; padding: 16px 16px 80px 16px;
+    background: #f5f7fa;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    will-change: transform;
+  }
+  .page.active {
+    transform: translateX(0);
+    opacity: 1;
+    z-index: 10;
+  }
+  .page.prev {
+    transform: translateX(-30%);
+    opacity: 0.5;
+    z-index: 5;
+  }
 
+  /* SPLASH */
   #splash {
     display: flex; flex-direction: column; justify-content: center;
-    align-items: center; min-height: 100vh;
+    align-items: center; height: 100vh; width: 100%;
     background: linear-gradient(135deg, #4A90E2, #357ABD);
-    color: white; text-align: center; padding: 20px;
+    color: white; text-align: center;
+    position: fixed; top: 0; left: 0; z-index: 9999;
+    padding: 20px;
+    transform: translateX(0); opacity: 1;
   }
+  #splash.hide { transform: translateX(-100%); opacity: 0; }
   #splash h1 { font-size: 48px; margin-bottom: 16px; }
   #splash p { font-size: 16px; opacity: 0.9; }
   .loading {
@@ -57,10 +81,10 @@
   }
   @keyframes loading { from { width: 0%; } to { width: 100%; } }
 
+  /* ONBOARDING */
   #onboarding {
     display: flex; flex-direction: column; justify-content: center;
-    min-height: 100vh; max-width: 400px; margin: 0 auto;
-    text-align: center; padding: 20px;
+    text-align: center; padding: 40px 20px;
   }
   #onboarding h1 { font-size: 32px; color: #4A90E2; margin-bottom: 16px; }
   #onboarding p { font-size: 16px; color: #666; margin-bottom: 24px; }
@@ -70,25 +94,29 @@
     margin-bottom: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); font-size: 14px;
   }
 
+  /* PILIH PERAN */
   #pilih-peran {
     display: flex; flex-direction: column; justify-content: center;
-    min-height: 100vh; max-width: 400px; margin: 0 auto;
-    text-align: center; padding: 20px;
+    text-align: center; padding: 40px 20px;
   }
-  #pilih-peran h1 { font-size: 24px; color: #4A90E2; margin-bottom: 24px; }
+  #pilih-peran h1 { font-size: 24px; color: #4A90E2; margin-bottom: 32px; }
   .peran-btn {
-    display: block; width: 100%; padding: 20px; border-radius: 16px;
+    display: block; width: 100%; padding: 24px; border-radius: 16px;
     border: none; font-size: 18px; font-weight: 700; cursor: pointer;
     margin-bottom: 16px; color: white;
+    transition: transform 0.2s;
   }
+  .peran-btn:active { transform: scale(0.97); }
   .peran-vendor { background: #4A90E2; }
   .peran-klien { background: #27ae60; }
 
+  /* HEADER */
   header {
     background: white; padding: 16px; display: flex;
     justify-content: space-between; align-items: center;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     position: sticky; top: 0; z-index: 100;
+    margin: -16px -16px 16px -16px;
   }
   header h1 { font-size: 20px; color: #4A90E2; }
   header nav a {
@@ -96,7 +124,8 @@
     font-size: 14px; font-weight: 600;
   }
 
-  .kolom { padding: 16px; }
+  /* KOLOM IKLAN */
+  .kolom { margin-bottom: 16px; }
   .kolom h2 { font-size: 16px; color: #4A90E2; margin-bottom: 12px; }
   .iklan-container { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 8px; }
   .iklan-card {
@@ -106,16 +135,19 @@
   .iklan-card h3 { font-size: 14px; margin-bottom: 4px; }
   .iklan-card p { font-size: 12px; color: #666; }
 
+  /* KATEGORI */
   .kategori-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr);
-    gap: 12px; padding: 16px;
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;
   }
   .kategori-grid a {
     padding: 16px; background: white; border-radius: 12px;
     text-decoration: none; color: #2c3e50; font-size: 14px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center;
+    transition: transform 0.2s;
   }
+  .kategori-grid a:active { transform: scale(0.97); }
 
+  /* PROFIL */
   .profil-card {
     background: white; border-radius: 16px; padding: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 16px;
@@ -137,6 +169,7 @@
   .badge-top { background: #fff5e5; color: #e67e22; }
   .badge-standard { background: #f0f0f0; color: #666; }
 
+  /* TOMBOL */
   .tombol { display: flex; gap: 12px; margin-top: 16px; }
   .tombol button {
     flex: 1; padding: 14px; border-radius: 12px;
@@ -150,18 +183,16 @@
     width: 100%; padding: 14px; background: #4A90E2; color: white;
     border: none; border-radius: 12px; font-size: 16px;
     font-weight: 600; cursor: pointer;
+    transition: transform 0.2s;
   }
-  .tombol-danger {
-    width: 100%; padding: 14px; background: #d63031; color: white;
-    border: none; border-radius: 12px; font-size: 16px;
-    font-weight: 600; cursor: pointer; margin-top: 12px;
-  }
+  .tombol-primary:active { transform: scale(0.97); }
   .tombol-lapor {
     display: inline-block; padding: 6px 12px; background: #ffe5e5;
     color: #d63031; border-radius: 8px; font-size: 12px;
     border: none; cursor: pointer; margin-top: 8px;
   }
 
+  /* PORTOFOLIO */
   .portofolio-grid {
     display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
   }
@@ -169,6 +200,7 @@
     aspect-ratio: 1; background: #e8f0fe; border-radius: 8px;
   }
 
+  /* ULASAN */
   .ulasan-item {
     padding: 12px; background: #f8f9fa; border-radius: 8px;
     margin-bottom: 8px; font-size: 14px;
@@ -176,6 +208,7 @@
   .ulasan-item .nama { font-weight: 600; }
   .ulasan-item .hp { font-size: 12px; color: #999; }
 
+  /* FORM */
   .form {
     max-width: 500px; margin: 0 auto; background: white;
     border-radius: 16px; padding: 24px;
@@ -189,20 +222,26 @@
   }
   .form .note { font-size: 12px; color: #999; margin-top: 12px; text-align: center; }
 
+  /* RATING */
   .rating { display: flex; gap: 8px; margin-bottom: 16px; font-size: 24px; cursor: pointer; }
   .rating span { color: #ddd; }
   .rating span.active { color: #f39c12; }
 
+  /* BOTTOM NAV */
   .bottom-nav {
     position: fixed; bottom: 0; left: 0; right: 0;
     background: white; display: flex; justify-content: space-around;
-    padding: 12px; box-shadow: 0 -2px 8px rgba(0,0,0,0.06); z-index: 100;
+    padding: 12px; box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+    z-index: 1000;
   }
   .bottom-nav a {
     text-decoration: none; color: #999; font-size: 12px; text-align: center;
+    padding: 4px 12px; border-radius: 8px;
+    transition: color 0.2s;
   }
-  .bottom-nav a.active { color: #4A90E2; }
+  .bottom-nav a.active { color: #4A90E2; font-weight: 600; }
 
+  /* FOOTER */
   footer {
     padding: 20px; text-align: center; color: #999; font-size: 12px;
   }
@@ -210,6 +249,7 @@
     margin: 0 8px; color: #4A90E2; text-decoration: none;
   }
 
+  /* HISTORY */
   .history-item {
     background: white; border-radius: 12px; padding: 16px;
     margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
@@ -221,6 +261,7 @@
     color: white; border-radius: 8px; text-decoration: none; font-size: 14px;
   }
 
+  /* DOKUMEN */
   .dokumen {
     max-width: 600px; margin: 0 auto; background: white;
     border-radius: 16px; padding: 24px;
@@ -231,12 +272,22 @@
   .dokumen p { margin-bottom: 8px; }
   .dokumen ul { padding-left: 20px; margin-bottom: 8px; }
   .dokumen li { margin-bottom: 4px; }
+
+  /* BACK BUTTON */
+  .back-btn {
+    display: inline-block; padding: 8px 16px; background: white;
+    color: #4A90E2; border-radius: 8px; text-decoration: none;
+    font-size: 14px; font-weight: 600; margin-bottom: 16px;
+    border: none; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
 </style>
 </head>
 <body>
 
+<div class="app">
+
 <!-- SPLASH -->
-<div id="splash" class="page active">
+<div id="splash">
   <h1>🎨 Kreatif ID</h1>
   <p>Platform Jasa Indonesia</p>
   <div class="loading"><div class="loading-bar"></div></div>
@@ -252,14 +303,14 @@
     <li>✅ Beri ulasan untuk vendor</li>
     <li>✅ 12 Kategori, 191 Jasa</li>
   </ul>
-  <button class="tombol-primary" onclick="showPage('pilih-peran')">Lanjut</button>
+  <button class="tombol-primary" onclick="goTo('pilih-peran')">Lanjut</button>
 </div>
 
 <!-- PILIH PERAN -->
 <div id="pilih-peran" class="page">
   <h1>Pilih Peran Anda</h1>
-  <button class="peran-btn peran-vendor" onclick="showPage('daftar')">Saya Vendor</button>
-  <button class="peran-btn peran-klien" onclick="showPage('info')">Saya Klien</button>
+  <button class="peran-btn peran-vendor" onclick="goTo('daftar')">Saya Vendor</button>
+  <button class="peran-btn peran-klien" onclick="goTo('info')">Saya Klien</button>
 </div>
 
 <!-- INFO AWAL -->
@@ -278,7 +329,7 @@
     <div style="background: #fff9e5; border-left: 4px solid #f39c12; padding: 12px; border-radius: 8px; margin-bottom: 16px; font-size: 14px;">
       ⚠️ Jika servis vendor kurang bagus, silakan berikan ulasan di profil vendor agar jadi bahan pertimbangan klien lain.
     </div>
-    <button class="tombol-primary" onclick="showPage('home')">Saya Mengerti</button>
+    <button class="tombol-primary" onclick="goTo('home')">Saya Mengerti</button>
   </div>
 </div>
 
@@ -287,8 +338,8 @@
   <header>
     <h1>🎨 Kreatif ID</h1>
     <nav>
-      <a href="#" onclick="showPage('kategori')">Kategori</a>
-      <a href="#" onclick="showPage('daftar')">Daftar</a>
+      <a href="#" onclick="goTo('kategori')">Kategori</a>
+      <a href="#" onclick="goTo('daftar')">Daftar</a>
     </nav>
   </header>
 
@@ -307,63 +358,61 @@
     <div class="iklan-container" id="kolom3"></div>
   </section>
 
-  <section class="kategori">
-    <h2 style="font-size: 16px; color: #4A90E2; margin-bottom: 12px; padding: 0 16px;">📂 Kategori Jasa</h2>
+  <section class="kolom">
+    <h2>📂 Kategori Jasa</h2>
     <div class="kategori-grid">
-      <a href="#" onclick="showPage('profil')">🎨 Kreatif & Media</a>
-      <a href="#" onclick="showPage('profil')">🎉 Acara & Event</a>
-      <a href="#" onclick="showPage('profil')">💄 Kecantikan</a>
-      <a href="#" onclick="showPage('profil')">🏠 Rumah & Bangunan</a>
-      <a href="#" onclick="showPage('profil')">📚 Pendidikan</a>
-      <a href="#" onclick="showPage('profil')">💪 Kesehatan</a>
-      <a href="#" onclick="showPage('profil')">💻 Digital</a>
-      <a href="#" onclick="showPage('profil')">🚗 Transport</a>
-      <a href="#" onclick="showPage('profil')">🍽️ Kuliner</a>
-      <a href="#" onclick="showPage('profil')">🔧 Otomotif</a>
-      <a href="#" onclick="showPage('profil')">🆕 Amal & Sosial</a>
-      <a href="#" onclick="showPage('profil')">🆕 Jasa Lainnya</a>
+      <a href="#" onclick="goTo('profil')">🎨 Kreatif & Media</a>
+      <a href="#" onclick="goTo('profil')">🎉 Acara & Event</a>
+      <a href="#" onclick="goTo('profil')">💄 Kecantikan</a>
+      <a href="#" onclick="goTo('profil')">🏠 Rumah & Bangunan</a>
+      <a href="#" onclick="goTo('profil')">📚 Pendidikan</a>
+      <a href="#" onclick="goTo('profil')">💪 Kesehatan</a>
+      <a href="#" onclick="goTo('profil')">💻 Digital</a>
+      <a href="#" onclick="goTo('profil')">🚗 Transport</a>
+      <a href="#" onclick="goTo('profil')">🍽️ Kuliner</a>
+      <a href="#" onclick="goTo('profil')">🔧 Otomotif</a>
+      <a href="#" onclick="goTo('profil')">🆕 Amal & Sosial</a>
+      <a href="#" onclick="goTo('profil')">🆕 Jasa Lainnya</a>
     </div>
   </section>
 
   <footer>
     <p>© 2026 Kreatif ID</p>
     <nav>
-      <a href="#" onclick="showPage('tentang')">Tentang</a>
-      <a href="#" onclick="showPage('faq')">FAQ</a>
-      <a href="#" onclick="showPage('privacy')">Privacy</a>
-      <a href="#" onclick="showPage('tos')">ToS</a>
-      <a href="#" onclick="showPage('disclaimer')">Disclaimer</a>
-      <a href="#" onclick="showPage('kontak')">Kontak</a>
+      <a href="#" onclick="goTo('tentang')">Tentang</a>
+      <a href="#" onclick="goTo('faq')">FAQ</a>
+      <a href="#" onclick="goTo('privacy')">Privacy</a>
+      <a href="#" onclick="goTo('tos')">ToS</a>
+      <a href="#" onclick="goTo('disclaimer')">Disclaimer</a>
+      <a href="#" onclick="goTo('kontak')">Kontak</a>
     </nav>
   </footer>
 </div>
 
 <!-- KATEGORI -->
 <div id="kategori" class="page">
-  <header>
-    <h1>📂 Kategori</h1>
-    <nav><a href="#" onclick="showPage('home')">← Kembali</a></nav>
-  </header>
+  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  <h1 style="font-size: 20px; color: #4A90E2; margin-bottom: 16px;">📂 Kategori</h1>
   <div class="kategori-grid">
-    <a href="#" onclick="showPage('profil')">🎨 Kreatif & Media</a>
-    <a href="#" onclick="showPage('profil')">🎉 Acara & Event</a>
-    <a href="#" onclick="showPage('profil')">💄 Kecantikan</a>
-    <a href="#" onclick="showPage('profil')">🏠 Rumah & Bangunan</a>
-    <a href="#" onclick="showPage('profil')">📚 Pendidikan</a>
-    <a href="#" onclick="showPage('profil')">💪 Kesehatan</a>
-    <a href="#" onclick="showPage('profil')">💻 Digital</a>
-    <a href="#" onclick="showPage('profil')">🚗 Transport</a>
-    <a href="#" onclick="showPage('profil')">🍽️ Kuliner</a>
-    <a href="#" onclick="showPage('profil')">🔧 Otomotif</a>
-    <a href="#" onclick="showPage('profil')">🆕 Amal & Sosial</a>
-    <a href="#" onclick="showPage('profil')">🆕 Jasa Lainnya</a>
+    <a href="#" onclick="goTo('profil')">🎨 Kreatif & Media</a>
+    <a href="#" onclick="goTo('profil')">🎉 Acara & Event</a>
+    <a href="#" onclick="goTo('profil')">💄 Kecantikan</a>
+    <a href="#" onclick="goTo('profil')">🏠 Rumah & Bangunan</a>
+    <a href="#" onclick="goTo('profil')">📚 Pendidikan</a>
+    <a href="#" onclick="goTo('profil')">💪 Kesehatan</a>
+    <a href="#" onclick="goTo('profil')">💻 Digital</a>
+    <a href="#" onclick="goTo('profil')">🚗 Transport</a>
+    <a href="#" onclick="goTo('profil')">🍽️ Kuliner</a>
+    <a href="#" onclick="goTo('profil')">🔧 Otomotif</a>
+    <a href="#" onclick="goTo('profil')">🆕 Amal & Sosial</a>
+    <a href="#" onclick="goTo('profil')">🆕 Jasa Lainnya</a>
   </div>
 </div>
 
 <!-- PROFIL -->
 <div id="profil" class="page">
-  <a href="#" onclick="showPage('home')" style="color: #4A90E2; text-decoration: none; font-size: 14px;">← Kembali</a>
-  <div class="profil-card" style="margin-top: 16px;">
+  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  <div class="profil-card">
     <div class="profil-header">
       <div class="profil-avatar">A</div>
       <div class="profil-info">
@@ -374,7 +423,7 @@
     <p style="font-size: 14px; color: #666; margin-bottom: 12px;">📍 Jakarta | 💰 Mulai Rp500rb</p>
     <p style="font-size: 14px; color: #666;">Fotografer wedding & prewedding. Berpengalaman 5 tahun.</p>
     <div class="tombol">
-      <button class="tombol-wa" onclick="showPage('isi-hp')">📱 WA</button>
+      <button class="tombol-wa" onclick="goTo('isi-hp')">📱 WA</button>
       <button class="tombol-ig" onclick="catatKlik('IG')">📷 IG</button>
       <button class="tombol-tiktok" onclick="catatKlik('TikTok')">🎵 TikTok</button>
     </div>
@@ -408,6 +457,7 @@
 
 <!-- ISI NO HP -->
 <div id="isi-hp" class="page">
+  <button class="back-btn" onclick="goBack()">← Kembali</button>
   <div class="form">
     <h1>📝 Isi No HP Anda</h1>
     <p style="font-size: 14px; color: #666; margin-bottom: 16px;">Sebelum menghubungi vendor, isi No HP Anda untuk verifikasi & history.</p>
@@ -421,7 +471,7 @@
 <!-- HISTORY -->
 <div id="history" class="page">
   <header><h1>📋 History Anda</h1></header>
-  <div id="historyList" style="padding: 16px;"></div>
+  <div id="historyList"></div>
 </div>
 
 <!-- ULASAN -->
@@ -455,6 +505,7 @@
 
 <!-- DAFTAR -->
 <div id="daftar" class="page">
+  <button class="back-btn" onclick="goBack()">← Kembali</button>
   <div class="form">
     <h1>📝 Daftar Vendor</h1>
     <label>Nama Usaha</label>
@@ -489,6 +540,7 @@
 
 <!-- PRIVACY -->
 <div id="privacy" class="page">
+  <button class="back-btn" onclick="goBack()">← Kembali</button>
   <div class="dokumen">
     <h1>🔒 Privacy Policy</h1>
     <h2>1. Data yang Kami Kumpulkan</h2>
@@ -530,12 +582,12 @@
       <li>Data terbatas</li>
       <li>Tidak untuk komersial</li>
     </ul>
-    <button class="tombol-primary" onclick="showPage('home')">Kembali</button>
   </div>
 </div>
 
 <!-- TOS -->
 <div id="tos" class="page">
+  <button class="back-btn" onclick="goBack()">← Kembali</button>
   <div class="dokumen">
     <h1>📜 Syarat & Ketentuan</h1>
     <h2>1. Hak Cipta</h2>
@@ -576,12 +628,12 @@
       <li>Kreatif ID tidak bertanggung jawab atas kerugian</li>
       <li>Kreatif ID tidak bertanggung jawab atas sengketa</li>
     </ul>
-    <button class="tombol-primary" onclick="showPage('home')">Kembali</button>
   </div>
 </div>
 
 <!-- DISCLAIMER -->
 <div id="disclaimer" class="page">
+  <button class="back-btn" onclick="goBack()">← Kembali</button>
   <div class="dokumen">
     <h1>⚠️ Disclaimer</h1>
     <p>Kreatif ID adalah platform yang mempertemukan penyedia jasa/pembuat karya dengan pengguna. Kami TIDAK terlibat dalam transaksi, kesepakatan, atau hubungan apa pun yang timbul dari pertemuan ini.</p>
@@ -593,12 +645,12 @@
       <li>Kreatif ID berhak menghapus konten yang melanggar aturan tanpa pemberitahuan.</li>
       <li>Kreatif ID berhak mengubah aturan ini kapan saja tanpa pemberitahuan.</li>
     </ul>
-    <button class="tombol-primary" onclick="showPage('home')">Kembali</button>
   </div>
 </div>
 
 <!-- TENTANG -->
 <div id="tentang" class="page">
+  <button class="back-btn" onclick="goBack()">← Kembali</button>
   <div class="dokumen">
     <h1>🎨 Tentang Kreatif ID</h1>
     <p>Kreatif ID adalah platform yang menghubungkan penyedia jasa dengan klien di seluruh Indonesia.</p>
@@ -610,14 +662,12 @@
       <li>Memberi kemudahan bagi klien mencari jasa</li>
       <li>Tidak pegang uang, tidak ikut campur transaksi</li>
     </ul>
-    <h2>Kategori</h2>
-    <p>12 Kategori, 191 Jasa: Kreatif, Acara, Kecantikan, Rumah, Pendidikan, Kesehatan, Digital, Transport, Kuliner, Otomotif, Amal, Lainnya.</p>
-    <button class="tombol-primary" onclick="showPage('home')">Kembali</button>
   </div>
 </div>
 
 <!-- FAQ -->
 <div id="faq" class="page">
+  <button class="back-btn" onclick="goBack()">← Kembali</button>
   <div class="dokumen">
     <h1>❓ FAQ</h1>
     <h2>Vendor</h2>
@@ -628,85 +678,202 @@
     <p><strong>Q: Apakah bayar di app?</strong><br>A: Tidak. Bayar langsung ke vendor.</p>
     <p><strong>Q: Bagaimana kalau vendor nakal?</strong><br>A: Lapor via app. Akan diverifikasi.</p>
     <p><strong>Q: Apakah identitas pelapor aman?</strong><br>A: Ya, dirahasiakan.</p>
-    <button class="tombol-primary" onclick="showPage('home')">Kembali</button>
   </div>
 </div>
 
 <!-- KONTAK -->
 <div id="kontak" class="page">
+  <button class="back-btn" onclick="goBack()">← Kembali</button>
   <div class="dokumen">
     <h1>📞 Kontak</h1>
     <p>Email: admin@kreatif-id.com</p>
     <p>WhatsApp: 0812-xxxx-xxxx</p>
     <p>Instagram: @kreatifid</p>
     <p>TikTok: @kreatifid</p>
-    <button class="tombol-primary" onclick="showPage('home')">Kembali</button>
   </div>
+</div>
+
 </div>
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <a href="#" onclick="showPage('home')" class="active">🏠 Home</a>
-  <a href="#" onclick="showPage('profil')">🔍 Cari</a>
-  <a href="#" onclick="showPage('history')">📋 History</a>
-  <a href="#" onclick="showPage('ulasan')">👤 Profil</a>
+  <a href="#" onclick="goTo('home')" id="nav-home" class="active">🏠 Home</a>
+  <a href="#" onclick="goTo('profil')" id="nav-cari">🔍 Cari</a>
+  <a href="#" onclick="goTo('history')" id="nav-history">📋 History</a>
+  <a href="#" onclick="goTo('ulasan')" id="nav-profil">👤 Profil</a>
 </nav>
 
 <script>
-function showPage(id) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0, 0);
+/* ===== NAVIGASI DENGAN HISTORY ===== */
+var currentPage = 'splash';
+var pageStack = [];
+
+function goTo(id) {
+  if (id === currentPage) return;
+  
+  var current = document.getElementById(currentPage);
+  var next = document.getElementById(id);
+  
+  if (current) {
+    current.classList.remove('active');
+    current.classList.add('prev');
+    setTimeout(function() {
+      current.classList.remove('prev');
+    }, 300);
+  }
+  
+  if (next) {
+    next.classList.add('active');
+    next.scrollTop = 0;
+  }
+  
+  pageStack.push(currentPage);
+  currentPage = id;
+  
+  // Simpan ke history HP
+  history.pushState({ page: id }, '', '#' + id);
+  
+  // Update bottom nav
+  updateNav(id);
 }
 
-setTimeout(() => {
-  document.getElementById('splash').classList.remove('active');
-  document.getElementById('onboarding').classList.add('active');
-}, 2000);
+function goBack() {
+  if (pageStack.length > 0) {
+    var prev = pageStack.pop();
+    var current = document.getElementById(currentPage);
+    var next = document.getElementById(prev);
+    
+    if (current) {
+      current.classList.remove('active');
+      current.classList.add('next-out');
+      setTimeout(function() {
+        current.classList.remove('next-out');
+      }, 300);
+    }
+    
+    if (next) {
+      next.classList.add('active');
+      next.scrollTop = 0;
+    }
+    
+    currentPage = prev;
+    updateNav(prev);
+    history.pushState({ page: prev }, '', '#' + prev);
+  }
+}
 
-const iklanKolom1 = [
+function updateNav(id) {
+  document.querySelectorAll('.bottom-nav a').forEach(function(a) {
+    a.classList.remove('active');
+  });
+  if (id === 'home') document.getElementById('nav-home').classList.add('active');
+  if (id === 'profil') document.getElementById('nav-cari').classList.add('active');
+  if (id === 'history') document.getElementById('nav-history').classList.add('active');
+  if (id === 'ulasan') document.getElementById('nav-profil').classList.add('active');
+}
+
+/* ===== SPLASH HANYA SEKALI ===== */
+window.addEventListener('load', function() {
+  history.replaceState({ page: 'onboarding' }, '', '#onboarding');
+  setTimeout(function() {
+    var splash = document.getElementById('splash');
+    if (splash) {
+      splash.classList.add('hide');
+      setTimeout(function() {
+        splash.style.display = 'none';
+      }, 400);
+    }
+    goTo('onboarding');
+  }, 2000);
+});
+
+/* ===== TOMBOL BACK HP ===== */
+window.addEventListener('popstate', function(e) {
+  if (pageStack.length > 0) {
+    goBack();
+  } else {
+    // Kalau tidak ada history, keluar app
+    if (confirm('Keluar dari Kreatif ID?')) {
+      window.history.back();
+    } else {
+      history.pushState({ page: currentPage }, '', '#' + currentPage);
+    }
+  }
+});
+
+/* ===== SWIPE KIRI/KANAN ===== */
+var touchStartX = 0;
+var touchEndX = 0;
+var touchStartY = 0;
+var touchEndY = 0;
+
+document.addEventListener('touchstart', function(e) {
+  touchStartX = e.changedTouches[0].screenX;
+  touchStartY = e.changedTouches[0].screenY;
+}, false);
+
+document.addEventListener('touchend', function(e) {
+  touchEndX = e.changedTouches[0].screenX;
+  touchEndY = e.changedTouches[0].screenY;
+  
+  var diffX = touchEndX - touchStartX;
+  var diffY = touchEndY - touchStartY;
+  
+  // Hanya swipe horizontal (bukan scroll vertikal)
+  if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 80) {
+    if (diffX > 0) {
+      // Swipe kanan = back
+      goBack();
+    } else {
+      // Swipe kiri = forward (kalau ada)
+      // Tidak ada aksi untuk sekarang
+    }
+  }
+}, false);
+
+/* ===== IKLAN ===== */
+var iklanKolom1 = [
   { nama: 'Ardi Photography', badge: 'TOP', rating: 5.0 },
   { nama: 'Budi Video', badge: 'PRO', rating: 4.7 }
 ];
-const iklanKolom2 = [
+var iklanKolom2 = [
   { nama: 'Siti MUA', badge: 'VERIFIED', rating: 4.5 },
   { nama: 'Dewi WO', badge: 'STANDARD', rating: 4.0 }
 ];
-const iklanKolom3 = [
+var iklanKolom3 = [
   { nama: 'Info Kreatif ID', badge: 'INFO', rating: '-' },
   { nama: 'New Member', badge: 'NEW', rating: '-' }
 ];
 
 function renderIklan(containerId, data) {
-  const container = document.getElementById(containerId);
+  var container = document.getElementById(containerId);
   if (!container) return;
-  container.innerHTML = data.map(item => `
-    <div class="iklan-card">
-      <h3>${item.nama}</h3>
-      <p>${item.badge} | ⭐ ${item.rating}</p>
-    </div>
-  `).join('');
+  container.innerHTML = data.map(function(item) {
+    return '<div class="iklan-card"><h3>' + item.nama + '</h3><p>' + item.badge + ' | ⭐ ' + item.rating + '</p></div>';
+  }).join('');
 }
 renderIklan('kolom1', iklanKolom1);
 renderIklan('kolom2', iklanKolom2);
 renderIklan('kolom3', iklanKolom3);
 
+/* ===== SIMPAN NO HP ===== */
 async function simpanHP() {
-  const noHP = document.getElementById('noHP').value;
+  var noHP = document.getElementById('noHP').value;
   if (!noHP) { alert('Isi No HP dulu!'); return; }
   try {
     await window.addDoc(window.collection(window.db, "klien"), {
       noHP: noHP, vendor: "Ardi Photography", tanggal: new Date()
     });
-    const history = JSON.parse(localStorage.getItem('history') || '[]');
-    history.push({ vendor: 'Ardi Photography', tanggal: new Date().toISOString(), noHP: noHP });
-    localStorage.setItem('history', JSON.stringify(history));
+    var historyData = JSON.parse(localStorage.getItem('history') || '[]');
+    historyData.push({ vendor: 'Ardi Photography', tanggal: new Date().toISOString(), noHP: noHP });
+    localStorage.setItem('history', JSON.stringify(historyData));
     window.location.href = 'https://wa.me/6281234567890';
   } catch (e) { alert('Gagal: ' + e.message); }
 }
 
+/* ===== CATAT KLIK ===== */
 async function catatKlik(aksi) {
-  const noHP = localStorage.getItem('klienNoHP') || 'tidak diketahui';
+  var noHP = localStorage.getItem('klienNoHP') || 'tidak diketahui';
   try {
     await window.addDoc(window.collection(window.db, "klik"), {
       noHP: noHP, vendor: "Ardi Photography", aksi: aksi, tanggal: new Date()
@@ -715,38 +882,37 @@ async function catatKlik(aksi) {
   } catch (e) { alert('Gagal: ' + e.message); }
 }
 
+/* ===== HISTORY ===== */
 function renderHistory() {
-  const history = JSON.parse(localStorage.getItem('history') || '[]');
-  const container = document.getElementById('historyList');
+  var historyData = JSON.parse(localStorage.getItem('history') || '[]');
+  var container = document.getElementById('historyList');
   if (!container) return;
-  if (history.length === 0) {
+  if (historyData.length === 0) {
     container.innerHTML = '<p style="text-align:center;color:#999;">Belum ada history.</p>';
     return;
   }
-  container.innerHTML = history.map(item => `
-    <div class="history-item">
-      <h3>${item.vendor}</h3>
-      <p>${new Date(item.tanggal).toLocaleDateString('id-ID')}</p>
-      <a href="#" onclick="showPage('ulasan')">Kasih Ulasan</a>
-    </div>
-  `).join('');
+  container.innerHTML = historyData.map(function(item) {
+    return '<div class="history-item"><h3>' + item.vendor + '</h3><p>' + new Date(item.tanggal).toLocaleDateString('id-ID') + '</p><a href="#" onclick="goTo(\'ulasan\')">Kasih Ulasan</a></div>';
+  }).join('');
 }
 renderHistory();
 
-let ratingValue = 0;
+/* ===== RATING ===== */
+var ratingValue = 0;
 function setRating(val) {
   ratingValue = val;
-  document.querySelectorAll('#rating span').forEach((s, i) => {
+  document.querySelectorAll('#rating span').forEach(function(s, i) {
     s.classList.toggle('active', i < val);
   });
 }
 
+/* ===== KIRIM ULASAN ===== */
 async function kirimUlasan() {
-  const nama = document.getElementById('nama').value;
-  const noHP = document.getElementById('noHPUlasan').value;
-  const email = document.getElementById('email').value;
-  const tanggalAcara = document.getElementById('tanggalAcara').value;
-  const komentar = document.getElementById('komentar').value;
+  var nama = document.getElementById('nama').value;
+  var noHP = document.getElementById('noHPUlasan').value;
+  var email = document.getElementById('email').value;
+  var tanggalAcara = document.getElementById('tanggalAcara').value;
+  var komentar = document.getElementById('komentar').value;
   if (!nama || !noHP) { alert('Isi nama & No HP!'); return; }
   if (ratingValue === 0) { alert('Pilih rating!'); return; }
   try {
@@ -756,17 +922,18 @@ async function kirimUlasan() {
       tanggalAcara: tanggalAcara, vendor: "Ardi Photography", createdAt: new Date()
     });
     alert('Ulasan terkirim!');
-    showPage('history');
+    goTo('history');
   } catch (e) { alert('Gagal: ' + e.message); }
 }
 
+/* ===== DAFTAR VENDOR ===== */
 async function daftarVendor() {
-  const nama = document.getElementById('namaUsaha').value;
-  const kategori = document.getElementById('kategoriDaftar').value;
-  const kota = document.getElementById('kotaDaftar').value;
-  const wa = document.getElementById('waDaftar').value;
-  const harga = document.getElementById('hargaDaftar').value;
-  const paket = document.getElementById('paketDaftar').value;
+  var nama = document.getElementById('namaUsaha').value;
+  var kategori = document.getElementById('kategoriDaftar').value;
+  var kota = document.getElementById('kotaDaftar').value;
+  var wa = document.getElementById('waDaftar').value;
+  var harga = document.getElementById('hargaDaftar').value;
+  var paket = document.getElementById('paketDaftar').value;
   if (!nama || !wa) { alert('Isi nama usaha & No WA!'); return; }
   try {
     await window.addDoc(window.collection(window.db, "vendors"), {
@@ -774,21 +941,14 @@ async function daftarVendor() {
       harga: harga, paket: paket, badge: "STANDARD", rating: 4.0, createdAt: new Date()
     });
     alert('Pendaftaran berhasil!');
-    showPage('home');
+    goTo('home');
   } catch (e) { alert('Gagal: ' + e.message); }
 }
 
+/* ===== LAPOR ===== */
 function lapor() {
-  const alasan = prompt('Alasan lapor:\n1. Plagiat\n2. Konten tidak pantas\n3. SARA\n4. Penipuan');
+  var alasan = prompt('Alasan lapor:\n1. Plagiat\n2. Konten tidak pantas\n3. SARA\n4. Penipuan');
   if (alasan) alert('Laporan terkirim! Admin akan verifikasi 3x24 jam.');
-}
-
-function hapusAkun() {
-  if (confirm('Anda yakin? Semua data akan dihapus permanen.')) {
-    localStorage.clear();
-    alert('Akun dihapus.');
-    showPage('home');
-  }
 }
 </script>
 
