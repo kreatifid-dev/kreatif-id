@@ -5,12 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Kreatif ID</title>
 <meta name="theme-color" content="#4A90E2">
+<meta name="color-scheme" content="light">
 <link rel="manifest" href="manifest.json">
 <script src="https://apis.google.com/js/api.js"></script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAUrQNYsj5o6CZLR1o48AeJHUShMEZetJA",
@@ -27,10 +28,8 @@ try {
   window.db = db;
   window.addDoc = addDoc;
   window.collection = collection;
-  window.getDocs = getDocs;
-  window.query = query;
-  window.orderBy = orderBy;
   window.firebaseReady = true;
+  console.log("✅ Firebase siap");
 } catch(e) {
   console.warn("Firebase gagal:", e);
   window.firebaseReady = false;
@@ -38,14 +37,35 @@ try {
 </script>
 
 <style>
+:root {
+  --primary: #4A90E2;
+  --primary-dark: #357ABD;
+  --primary-light: #E8F0FE;
+  --success: #27ae60;
+  --danger: #e74c3c;
+  --warning: #f39c12;
+  --text: #2c3e50;
+  --text-muted: #7a8a9a;
+  --bg: #f5f7fa;
+  --card: #ffffff;
+  --border: #e8ecf1;
+  --shadow-sm: 0 2px 8px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,.12);
+  --radius: 16px;
+  --radius-sm: 12px;
+  --radius-lg: 20px;
+}
+
 * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-html, body { height:100%; overflow:hidden; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:#f5f7fa; color:#2c3e50; line-height:1.5; }
+html, body { height:100%; overflow:hidden; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg); color:var(--text); line-height:1.5; -webkit-font-smoothing:antialiased; }
 .app { position:relative; width:100%; height:100vh; overflow:hidden; }
 
-.page { position:absolute; top:0; left:0; width:100%; height:100%; overflow-y:auto; padding:16px 16px 90px 16px; background:#f5f7fa; transform:translateX(100%); opacity:0; transition:transform .25s ease, opacity .25s ease; pointer-events:none; visibility:hidden; }
+.page { position:absolute; top:0; left:0; width:100%; height:100%; overflow-y:auto; padding:16px 16px 90px 16px; background:var(--bg); transform:translateX(100%); opacity:0; transition:transform .3s cubic-bezier(.4,0,.2,1), opacity .3s ease; pointer-events:none; visibility:hidden; }
 .page.active { transform:translateX(0); opacity:1; pointer-events:auto; visibility:visible; z-index:10; }
 
-#splash { display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; width:100%; background:linear-gradient(135deg,#4A90E2,#357ABD); color:#fff; text-align:center; position:fixed; top:0; left:0; z-index:9999; padding:20px; transition:transform .4s ease, opacity .4s ease; }
+/* SPLASH */
+#splash { display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh; width:100%; background:linear-gradient(135deg,#4A90E2,#357ABD); color:#fff; text-align:center; position:fixed; top:0; left:0; z-index:9999; padding:20px; transition:transform .45s cubic-bezier(.4,0,.2,1), opacity .45s ease; }
 #splash.hide { transform:translateX(-100%); opacity:0; pointer-events:none; }
 #splash h1 { font-size:44px; margin-bottom:12px; }
 #splash p { font-size:15px; opacity:.9; }
@@ -53,119 +73,239 @@ html, body { height:100%; overflow:hidden; font-family:-apple-system,BlinkMacSys
 .loading-bar { width:0%; height:100%; background:#fff; animation:loading 1.8s ease-in-out forwards; }
 @keyframes loading { from{width:0%} to{width:100%} }
 
-header { background:#fff; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 2px 8px rgba(0,0,0,.06); position:sticky; top:0; z-index:100; margin:-16px -16px 16px -16px; }
-header h1 { font-size:19px; color:#4A90E2; }
-header nav a { margin-left:12px; color:#4A90E2; font-size:13px; font-weight:600; cursor:pointer; }
+/* HEADER */
+header { background:#fff; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; box-shadow:var(--shadow-sm); position:sticky; top:0; z-index:100; margin:-16px -16px 16px -16px; }
+.header-greet h1 { font-size:18px; color:var(--primary); font-weight:700; line-height:1.2; }
+.header-greet .sub { font-size:11px; color:var(--text-muted); font-weight:500; margin-top:1px; }
+header nav a { margin-left:12px; color:var(--primary); font-size:13px; font-weight:600; cursor:pointer; }
+header nav a:active { opacity:.6; }
 
+/* KOLOM */
 .kolom { margin-bottom:18px; }
-.kolom h2 { font-size:15px; color:#4A90E2; margin-bottom:10px; font-weight:700; }
-.iklan-container { display:flex; gap:10px; overflow-x:auto; padding-bottom:6px; }
-.iklan-card { min-width:180px; background:#fff; border-radius:12px; padding:14px; box-shadow:0 2px 8px rgba(0,0,0,.06); cursor:pointer; }
-.iklan-card:active { transform:scale(.97); }
-.iklan-card h3 { font-size:13px; margin-bottom:4px; }
-.iklan-card p { font-size:11px; color:#666; }
+.kolom h2 { font-size:15px; color:var(--primary); margin-bottom:10px; font-weight:700; }
+.iklan-container { display:flex; gap:10px; overflow-x:auto; padding-bottom:6px; scrollbar-width:none; }
+.iklan-container::-webkit-scrollbar { display:none; }
+.iklan-card { min-width:180px; background:var(--card); border-radius:var(--radius-sm); padding:14px; box-shadow:var(--shadow-sm); cursor:pointer; transition:transform .15s ease, box-shadow .15s ease; }
+.iklan-card:active { transform:scale(.97); box-shadow:var(--shadow-md); }
+.iklan-card h3 { font-size:13px; margin-bottom:4px; font-weight:600; }
+.iklan-card p { font-size:11px; color:var(--text-muted); }
 
 .kategori-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
-.kategori-grid button { padding:16px 12px; background:#fff; border-radius:12px; color:#2c3e50; font-size:13px; box-shadow:0 2px 8px rgba(0,0,0,.06); border:none; cursor:pointer; font-family:inherit; font-weight:500; }
-.kategori-grid button:active { transform:scale(.96); background:#eef4ff; }
+.kategori-grid button { padding:16px 12px; background:var(--card); border-radius:var(--radius-sm); color:var(--text); font-size:13px; box-shadow:var(--shadow-sm); border:none; cursor:pointer; font-family:inherit; font-weight:500; transition:transform .15s ease, background .15s ease; }
+.kategori-grid button:active { transform:scale(.96); background:var(--primary-light); }
 
-.profil-card { background:#fff; border-radius:16px; padding:18px; box-shadow:0 2px 8px rgba(0,0,0,.06); margin-bottom:14px; }
+/* PROFIL CARD */
+.profil-card { background:var(--card); border-radius:var(--radius); padding:18px; box-shadow:var(--shadow-sm); margin-bottom:14px; }
 .profil-header { display:flex; align-items:center; gap:14px; margin-bottom:14px; }
-.profil-avatar { width:60px; height:60px; border-radius:50%; background:#4A90E2; display:flex; align-items:center; justify-content:center; color:#fff; font-size:22px; font-weight:700; flex-shrink:0; }
-.profil-info h2 { font-size:18px; margin-bottom:4px; }
-.profil-info p { font-size:13px; color:#666; }
+.profil-avatar { width:60px; height:60px; border-radius:50%; background:linear-gradient(135deg,var(--primary),#6BB6FF); display:flex; align-items:center; justify-content:center; color:#fff; font-size:22px; font-weight:700; flex-shrink:0; box-shadow:0 4px 12px rgba(74,144,226,.25); }
+.profil-info h2 { font-size:18px; margin-bottom:4px; font-weight:700; }
+.profil-info p { font-size:13px; color:var(--text-muted); }
 
+/* PROFIL LOCKED (NEW) */
+.profil-locked { text-align:center; padding:14px 0 20px 0; }
+.profil-avatar-lg {
+  width:88px; height:88px; border-radius:50%;
+  background:linear-gradient(135deg,var(--primary),#6BB6FF);
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-size:34px; font-weight:800; margin:0 auto 14px auto;
+  box-shadow:0 8px 24px rgba(74,144,226,.3);
+  position:relative;
+}
+.profil-avatar-lg::after {
+  content:"✓"; position:absolute; bottom:2px; right:2px;
+  width:26px; height:26px; border-radius:50%;
+  background:var(--success); color:#fff;
+  display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:800; border:3px solid #fff;
+}
+.profil-locked h2 { font-size:22px; font-weight:700; margin-bottom:6px; color:var(--text); }
+.profil-hp { font-size:15px; color:var(--text-muted); font-weight:500; letter-spacing:.4px; margin-bottom:12px; }
+.verified-pill {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:6px 14px; background:#e5f5e5; color:var(--success);
+  border-radius:20px; font-size:11px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.3px;
+}
+.profil-actions { display:flex; flex-direction:column; gap:8px; margin-top:8px; }
+
+.tombol-danger {
+  width:100%; padding:13px; background:#fff; color:var(--danger);
+  border:2px solid #ffe0e0; border-radius:var(--radius-sm);
+  font-size:14px; font-weight:600; cursor:pointer; font-family:inherit;
+  margin-top:8px; transition:background .15s ease, transform .15s ease;
+}
+.tombol-danger:active { transform:scale(.97); background:#fff5f5; }
+
+/* BADGE */
 .badge { display:inline-block; padding:3px 10px; border-radius:10px; font-size:11px; font-weight:600; }
 .badge-top { background:#fff5e5; color:#e67e22; }
 .badge-pro { background:#e5f5e5; color:#27ae60; }
 .badge-standard { background:#f0f0f0; color:#666; }
-.badge-gratis { background:#f0f0f0; color:#666; }
-.badge-info { background:#e5f0ff; color:#4A90E2; }
+.badge-info { background:#e5f0ff; color:var(--primary); }
 .badge-new { background:#ffe5f0; color:#e91e63; }
 
+/* TOMBOL */
 .tombol { display:flex; gap:8px; margin-top:12px; }
-.tombol button { flex:1; padding:12px; border-radius:10px; font-weight:600; font-size:13px; border:none; cursor:pointer; font-family:inherit; color:#fff; }
+.tombol button { flex:1; padding:12px; border-radius:10px; font-weight:600; font-size:13px; border:none; cursor:pointer; font-family:inherit; color:#fff; transition:transform .15s ease; }
+.tombol button:active { transform:scale(.96); }
 .tombol-wa { background:#25D366; }
 .tombol-ig { background:#E1306C; }
 .tombol-tiktok { background:#000; }
 
-.tombol-primary { width:100%; padding:14px; background:#4A90E2; color:#fff; border:none; border-radius:12px; font-size:15px; font-weight:600; cursor:pointer; font-family:inherit; margin-top:10px; }
-.tombol-primary:active { transform:scale(.97); }
-.tombol-secondary { width:100%; padding:13px; background:#fff; color:#4A90E2; border:2px solid #4A90E2; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; margin-top:8px; }
+.tombol-primary { width:100%; padding:14px; background:linear-gradient(135deg,var(--primary),#5BA3F5); color:#fff; border:none; border-radius:var(--radius-sm); font-size:15px; font-weight:600; cursor:pointer; font-family:inherit; margin-top:10px; transition:transform .15s ease, box-shadow .15s ease; box-shadow:0 4px 12px rgba(74,144,226,.3); }
+.tombol-primary:active { transform:scale(.97); box-shadow:0 2px 6px rgba(74,144,226,.3); }
+.tombol-secondary { width:100%; padding:13px; background:#fff; color:var(--primary); border:2px solid var(--primary); border-radius:var(--radius-sm); font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; margin-top:8px; transition:background .15s ease, transform .15s ease; }
+.tombol-secondary:active { transform:scale(.97); background:var(--primary-light); }
 .tombol-lapor { padding:5px 10px; background:#ffe5e5; color:#d63031; border-radius:6px; font-size:11px; border:none; cursor:pointer; font-family:inherit; margin-top:6px; }
 
+/* PORTOFOLIO */
 .portofolio-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:6px; }
 .portofolio-grid > * { aspect-ratio:1; background:linear-gradient(135deg,#e8f0fe,#c9dcff); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:22px; overflow:hidden; }
 .portofolio-grid img { width:100%; height:100%; object-fit:cover; }
 
+/* SKELETON */
+.skeleton { background:linear-gradient(90deg,#e8ecf1 25%,#f2f5f9 50%,#e8ecf1 75%); background-size:200% 100%; animation:skeleton 1.4s ease-in-out infinite; border-radius:8px; }
+@keyframes skeleton { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+.skeleton-box { aspect-ratio:1; border-radius:8px; }
+
+/* ULASAN */
 .ulasan-item { padding:10px; background:#f8f9fa; border-radius:8px; margin-bottom:8px; font-size:13px; }
 .ulasan-item .nama { font-weight:600; }
 
-.form { max-width:520px; margin:0 auto 14px; background:#fff; border-radius:16px; padding:20px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
-.form h1 { font-size:18px; color:#4A90E2; margin-bottom:14px; text-align:center; }
-.form h3 { font-size:15px; margin-bottom:10px; color:#2c3e50; }
-.form label { display:block; font-size:13px; font-weight:600; margin-bottom:5px; margin-top:10px; }
-.form input, .form textarea, .form select { width:100%; padding:11px; border:1px solid #ddd; border-radius:8px; font-size:14px; font-family:inherit; background:#fff; }
-.form input:focus, .form textarea:focus, .form select:focus { outline:none; border-color:#4A90E2; }
-.form .note { font-size:11px; color:#999; margin-top:10px; text-align:center; }
+/* FORM */
+.form { max-width:520px; margin:0 auto 14px; background:var(--card); border-radius:var(--radius); padding:20px; box-shadow:var(--shadow-sm); }
+.form h1 { font-size:18px; color:var(--primary); margin-bottom:14px; text-align:center; }
+.form h3 { font-size:15px; margin-bottom:10px; color:var(--text); }
+.form label { display:block; font-size:13px; font-weight:600; margin-bottom:5px; margin-top:10px; color:var(--text); }
+.form input, .form textarea { width:100%; padding:12px; border:1.5px solid var(--border); border-radius:10px; font-size:14px; font-family:inherit; background:#fff; color:var(--text); transition:border-color .15s ease, box-shadow .15s ease; }
+.form input:focus, .form textarea:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(74,144,226,.12); }
 
+/* CUSTOM SELECT */
+.form select {
+  width:100%; padding:12px 40px 12px 12px;
+  border:1.5px solid var(--border); border-radius:10px;
+  font-size:14px; font-family:inherit;
+  background:#fff url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234A90E2' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'/%3e%3c/svg%3e") no-repeat right 14px center;
+  background-size:16px;
+  appearance:none; -webkit-appearance:none; -moz-appearance:none;
+  color:var(--text); cursor:pointer;
+  transition:border-color .15s ease, box-shadow .15s ease;
+}
+.form select:focus { outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(74,144,226,.12); }
+.form select option { background:#fff; color:var(--text); }
+.form .note { font-size:11px; color:var(--text-muted); margin-top:10px; text-align:center; }
+
+/* RATING */
 .rating { display:flex; gap:6px; margin:6px 0; font-size:26px; cursor:pointer; }
-.rating span { color:#ddd; }
+.rating span { color:#ddd; transition:color .15s, transform .15s; }
 .rating span.active { color:#f39c12; }
+.rating span:active { transform:scale(1.2); }
 
-.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:#fff; display:flex; justify-content:space-around; padding:8px 4px; box-shadow:0 -2px 8px rgba(0,0,0,.06); z-index:5000; }
-.bottom-nav button { background:transparent; border:none; color:#999; font-size:10px; padding:6px 8px; border-radius:8px; cursor:pointer; font-family:inherit; display:flex; flex-direction:column; align-items:center; gap:2px; min-width:56px; }
-.bottom-nav button .ico { font-size:19px; line-height:1; }
-.bottom-nav button.active { color:#4A90E2; font-weight:600; }
+/* BOTTOM NAV */
+.bottom-nav { position:fixed; bottom:0; left:0; right:0; background:#fff; display:flex; justify-content:space-around; padding:8px 4px; box-shadow:0 -2px 12px rgba(0,0,0,.06); z-index:5000; }
+.bottom-nav button { background:transparent; border:none; color:#999; font-size:10px; padding:6px 8px; border-radius:8px; cursor:pointer; font-family:inherit; display:flex; flex-direction:column; align-items:center; gap:3px; min-width:56px; transition:color .2s ease, transform .15s ease; }
+.bottom-nav button svg { width:22px; height:22px; stroke-width:2; }
+.bottom-nav button.active { color:var(--primary); font-weight:600; }
+.bottom-nav button:active { transform:scale(.94); }
 
-footer { padding:18px; text-align:center; color:#999; font-size:11px; }
-footer nav a { margin:0 6px; color:#4A90E2; cursor:pointer; display:inline-block; margin-bottom:5px; }
+/* FOOTER */
+footer { padding:18px; text-align:center; color:var(--text-muted); font-size:11px; }
+footer nav a { margin:0 6px; color:var(--primary); cursor:pointer; display:inline-block; margin-bottom:5px; }
 
-.history-item { background:#fff; border-radius:12px; padding:14px; margin-bottom:10px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+/* HISTORY */
+.history-item { background:var(--card); border-radius:var(--radius-sm); padding:14px; margin-bottom:10px; box-shadow:var(--shadow-sm); }
 .history-item h3 { font-size:15px; margin-bottom:3px; }
-.history-item p { font-size:12px; color:#666; margin-bottom:8px; }
-.history-item button { padding:7px 14px; background:#4A90E2; color:#fff; border-radius:8px; border:none; font-size:13px; cursor:pointer; font-family:inherit; }
+.history-item p { font-size:12px; color:var(--text-muted); margin-bottom:8px; }
+.history-item button { padding:8px 14px; background:var(--primary); color:#fff; border-radius:8px; border:none; font-size:13px; cursor:pointer; font-family:inherit; font-weight:600; }
 
-.dokumen { max-width:600px; margin:0 auto; background:#fff; border-radius:16px; padding:22px; box-shadow:0 2px 8px rgba(0,0,0,.06); font-size:13px; }
-.dokumen h1 { font-size:18px; color:#4A90E2; margin-bottom:14px; }
-.dokumen h2 { font-size:15px; color:#2c3e50; margin:14px 0 6px; }
+/* DOKUMEN */
+.dokumen { max-width:600px; margin:0 auto; background:var(--card); border-radius:var(--radius); padding:22px; box-shadow:var(--shadow-sm); font-size:13px; }
+.dokumen h1 { font-size:18px; color:var(--primary); margin-bottom:14px; }
+.dokumen h2 { font-size:15px; color:var(--text); margin:14px 0 6px; }
 .dokumen p { margin-bottom:7px; }
 .dokumen ul { padding-left:18px; margin-bottom:7px; }
 .dokumen li { margin-bottom:3px; }
 
-.back-btn { display:inline-flex; align-items:center; padding:7px 14px; background:#fff; color:#4A90E2; border-radius:8px; font-size:13px; font-weight:600; margin-bottom:14px; border:none; cursor:pointer; font-family:inherit; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+.back-btn { display:inline-flex; align-items:center; gap:5px; padding:8px 14px; background:#fff; color:var(--primary); border-radius:10px; font-size:13px; font-weight:600; margin-bottom:14px; border:none; cursor:pointer; font-family:inherit; box-shadow:var(--shadow-sm); transition:transform .15s ease; }
+.back-btn:active { transform:scale(.96); }
+.back-btn svg { width:14px; height:14px; stroke-width:2.5; }
 
-.modal { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,.55); z-index:9000; display:none; align-items:center; justify-content:center; padding:20px; }
+/* MODAL */
+.modal { position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(15,23,42,.55); backdrop-filter:blur(3px); z-index:9000; display:none; align-items:center; justify-content:center; padding:20px; animation:fadeIn .2s ease; }
 .modal.show { display:flex; }
-.modal-box { background:#fff; border-radius:16px; padding:22px; width:100%; max-width:380px; }
-.modal-box h3 { font-size:17px; margin-bottom:8px; color:#4A90E2; }
-.modal-box p { font-size:12px; color:#666; margin-bottom:12px; }
-.modal-box input { width:100%; padding:12px; border:1px solid #ddd; border-radius:8px; font-size:15px; font-family:inherit; margin-bottom:12px; }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+.modal-box { background:#fff; border-radius:var(--radius-lg); padding:22px; width:100%; max-width:380px; animation:slideUp .3s cubic-bezier(.4,0,.2,1); }
+@keyframes slideUp { from{opacity:0; transform:translateY(20px)} to{opacity:1; transform:translateY(0)} }
+.modal-box h3 { font-size:17px; margin-bottom:8px; color:var(--primary); }
+.modal-box p { font-size:13px; color:var(--text-muted); margin-bottom:12px; line-height:1.5; }
+.modal-box input { width:100%; padding:12px; border:1.5px solid var(--border); border-radius:10px; font-size:15px; font-family:inherit; margin-bottom:12px; }
+.modal-box input:focus { outline:none; border-color:var(--primary); }
 
-.paket-info { background:#f8f9fa; border-radius:10px; padding:12px; margin-bottom:10px; border-left:4px solid #4A90E2; }
-.paket-info h4 { font-size:14px; color:#4A90E2; margin-bottom:5px; }
-.paket-info ul { list-style:none; padding-left:0; font-size:12px; }
-.paket-info li { padding:2px 0; }
+/* TOAST (NEW) */
+#toast-container {
+  position:fixed; top:20px; left:50%; transform:translateX(-50%);
+  z-index:99999; display:flex; flex-direction:column; gap:8px;
+  pointer-events:none; width:calc(100% - 32px); max-width:420px;
+}
+.toast {
+  background:#fff; border-radius:14px; padding:14px 16px;
+  box-shadow:0 12px 32px rgba(0,0,0,.15);
+  display:flex; align-items:center; gap:10px;
+  font-size:14px; font-weight:500; color:var(--text);
+  animation:toastIn .35s cubic-bezier(.4,0,.2,1);
+  pointer-events:auto; border-left:4px solid var(--primary);
+  line-height:1.4;
+}
+.toast.success { border-color:var(--success); }
+.toast.error { border-color:var(--danger); }
+.toast.info { border-color:var(--primary); }
+.toast.warning { border-color:var(--warning); }
+.toast .toast-icon { font-size:18px; flex-shrink:0; }
+.toast.hide { animation:toastOut .3s ease forwards; }
+@keyframes toastIn { from{opacity:0; transform:translateY(-24px) scale(.96)} to{opacity:1; transform:translateY(0) scale(1)} }
+@keyframes toastOut { to{opacity:0; transform:translateY(-24px) scale(.96)} }
 
-.vendor-list-item { background:#fff; border-radius:12px; padding:12px; margin-bottom:9px; box-shadow:0 2px 8px rgba(0,0,0,.05); cursor:pointer; display:flex; gap:11px; align-items:center; }
-.vendor-list-item:active { transform:scale(.98); }
-.vendor-list-avatar { width:48px; height:48px; border-radius:50%; background:#4A90E2; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:18px; flex-shrink:0; }
-.vendor-list-info { flex:1; min-width:0; }
-.vendor-list-info h3 { font-size:14px; margin-bottom:2px; }
-.vendor-list-info p { font-size:11px; color:#666; }
+/* ACCORDION */
+.accordion { border:1.5px solid var(--border); border-radius:var(--radius-sm); overflow:hidden; margin-bottom:10px; background:#fff; }
+.accordion summary { padding:14px 16px; cursor:pointer; font-weight:600; font-size:14px; color:var(--text); list-style:none; display:flex; justify-content:space-between; align-items:center; transition:background .15s; }
+.accordion summary::-webkit-details-marker { display:none; }
+.accordion summary:active { background:#f8f9fa; }
+.accordion summary::after { content:"+"; color:var(--primary); font-size:20px; font-weight:700; transition:transform .2s; }
+.accordion[open] summary::after { content:"−"; }
+.accordion[open] summary { background:#f8f9fa; }
+.accordion-content { padding:0 16px 16px 16px; font-size:13px; color:#555; }
+.accordion-content ul { padding-left:18px; margin-top:6px; }
+.accordion-content li { margin-bottom:4px; }
 
-.alert-box { padding:11px; border-radius:8px; font-size:12px; margin-bottom:12px; line-height:1.5; }
-.alert-warn { background:#fff9e5; border-left:4px solid #f39c12; }
-.alert-info { background:#e8f0fe; border-left:4px solid #4A90E2; }
-.alert-ok { background:#e5f5e5; border-left:4px solid #27ae60; }
+/* ALERT */
+.alert-box { padding:12px 14px; border-radius:10px; font-size:12px; margin-bottom:12px; line-height:1.5; }
+.alert-warn { background:#fff9e5; border-left:4px solid var(--warning); }
+.alert-info { background:var(--primary-light); border-left:4px solid var(--primary); }
+.alert-ok { background:#e5f5e5; border-left:4px solid var(--success); }
 
 .list-check { list-style:none; padding-left:0; }
-.list-check li { padding:7px 11px; background:#f8f9fa; border-radius:8px; margin-bottom:5px; font-size:12px; }
+.list-check li { padding:8px 12px; background:#f8f9fa; border-radius:8px; margin-bottom:5px; font-size:12px; }
 
-.peran-btn { display:block; width:100%; padding:22px; border-radius:16px; border:none; font-size:17px; font-weight:700; cursor:pointer; margin-bottom:14px; color:#fff; }
+.peran-btn { display:block; width:100%; padding:22px; border-radius:var(--radius-lg); border:none; font-size:17px; font-weight:700; cursor:pointer; margin-bottom:14px; color:#fff; transition:transform .15s ease, box-shadow .15s ease; box-shadow:var(--shadow-md); }
 .peran-btn:active { transform:scale(.97); }
 
-.empty { text-align:center; color:#999; font-size:13px; padding:20px; }
+.empty { text-align:center; color:var(--text-muted); font-size:13px; padding:20px; }
+
+.filter-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:8px; }
+.filter-row select { padding:10px 32px 10px 10px; font-size:13px; }
+
+/* VENDOR LIST */
+.vendor-list-item { background:var(--card); border-radius:var(--radius-sm); padding:12px; margin-bottom:9px; box-shadow:var(--shadow-sm); cursor:pointer; display:flex; gap:11px; align-items:center; transition:transform .15s ease; }
+.vendor-list-item:active { transform:scale(.98); }
+.vendor-list-avatar { width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,var(--primary),#6BB6FF); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:18px; flex-shrink:0; }
+.vendor-list-info { flex:1; min-width:0; }
+.vendor-list-info h3 { font-size:14px; margin-bottom:2px; }
+.vendor-list-info p { font-size:11px; color:var(--text-muted); }
+
+.paket-info { background:#f8f9fa; border-radius:10px; padding:12px; margin-bottom:10px; border-left:4px solid var(--primary); }
+.paket-info h4 { font-size:14px; color:var(--primary); margin-bottom:5px; }
+.paket-info ul { list-style:none; padding-left:0; font-size:12px; }
+.paket-info li { padding:2px 0; }
 </style>
 </head>
 <body>
@@ -207,7 +347,7 @@ footer nav a { margin:0 6px; color:#4A90E2; cursor:pointer; display:inline-block
 <!-- INFO KLIEN -->
 <div id="info-klien" class="page">
   <div class="form">
-    <h1>ℹ️ INFORMASI PENTING</h1>
+    <h1>ℹ️ Informasi Penting</h1>
     <p style="margin-bottom:14px; font-size:13px; color:#666;">Kreatif ID menghubungkan Anda langsung dengan vendor via WhatsApp.</p>
     <ul class="list-check">
       <li>✅ Transaksi dilakukan LANGSUNG dengan vendor</li>
@@ -223,53 +363,78 @@ footer nav a { margin:0 6px; color:#4A90E2; cursor:pointer; display:inline-block
 <!-- INFO VENDOR -->
 <div id="info-vendor" class="page">
   <div class="form">
-    <h1>📋 INFO & PERATURAN VENDOR</h1>
+    <h1>📋 Info & Peraturan Vendor</h1>
     <div class="alert-box alert-info">Baca dulu sebelum daftar. Dengan menekan <b>Setuju & Lanjut</b>, Anda menyetujui semua peraturan.</div>
 
     <h3>📦 Paket & Benefit</h3>
-    <div class="paket-info"><h4>🆓 GRATIS — Rp0</h4><ul>
-      <li>✔️ Profil vendor dasar</li>
-      <li>✔️ Portofolio Google Drive tampil di profil</li>
-      <li>✔️ Muncul di hasil pencarian</li>
-      <li>❌ Tanpa badge</li>
-      <li>❌ Tidak bisa iklan di kolom beranda</li>
-    </ul></div>
-    <div class="paket-info"><h4>💎 STANDARD — Rp49.999/bulan</h4><ul>
-      <li>✔️ Badge STANDARD di profil</li>
-      <li>✔️ Portofolio unlimited</li>
-      <li>✔️ Prioritas pencarian menengah</li>
-      <li>✔️ 1x repost IG @kreatifid</li>
-    </ul></div>
-    <div class="paket-info"><h4>🚀 PRO — Rp99.999/bulan</h4><ul>
-      <li>✔️ Badge PRO + centang biru</li>
-      <li>✔️ Portofolio unlimited + video</li>
-      <li>✔️ Prioritas pencarian tinggi</li>
-      <li>✔️ 4x repost IG + TikTok</li>
-      <li>✔️ Iklan di kolom "STANDARD & PRO" beranda</li>
-    </ul></div>
-    <div class="paket-info"><h4>🏆 TOP — Rp199.999/bulan</h4><ul>
-      <li>✔️ Badge TOP + verifikasi ✅</li>
-      <li>✔️ Portofolio unlimited + video</li>
-      <li>✔️ Prioritas TERTINGGI</li>
-      <li>✔️ 8x repost IG + TikTok</li>
-      <li>✔️ Iklan di kolom "TOP & PRO" beranda</li>
-      <li>✔️ Dibantu promosi di grup WA Kreatif ID</li>
-    </ul></div>
+    <details class="accordion">
+      <summary>🆓 GRATIS — Rp0</summary>
+      <div class="accordion-content">
+        <ul>
+          <li>✔️ Profil vendor dasar</li>
+          <li>✔️ Portofolio Google Drive tampil di profil</li>
+          <li>✔️ Muncul di hasil pencarian</li>
+          <li>❌ Tanpa badge</li>
+          <li>❌ Tidak bisa iklan di kolom beranda</li>
+        </ul>
+      </div>
+    </details>
+    <details class="accordion">
+      <summary>💎 STANDARD — Rp49.999/bulan</summary>
+      <div class="accordion-content">
+        <ul>
+          <li>✔️ Badge STANDARD di profil</li>
+          <li>✔️ Portofolio unlimited</li>
+          <li>✔️ Prioritas pencarian menengah</li>
+          <li>✔️ 1x repost IG @kreatifid</li>
+        </ul>
+      </div>
+    </details>
+    <details class="accordion">
+      <summary>🚀 PRO — Rp99.999/bulan</summary>
+      <div class="accordion-content">
+        <ul>
+          <li>✔️ Badge PRO + centang biru</li>
+          <li>✔️ Portofolio unlimited + video</li>
+          <li>✔️ Prioritas pencarian tinggi</li>
+          <li>✔️ 4x repost IG + TikTok</li>
+          <li>✔️ Iklan di kolom "STANDARD & PRO" beranda</li>
+        </ul>
+      </div>
+    </details>
+    <details class="accordion">
+      <summary>🏆 TOP — Rp199.999/bulan</summary>
+      <div class="accordion-content">
+        <ul>
+          <li>✔️ Badge TOP + verifikasi ✅</li>
+          <li>✔️ Portofolio unlimited + video</li>
+          <li>✔️ Prioritas TERTINGGI</li>
+          <li>✔️ 8x repost IG + TikTok</li>
+          <li>✔️ Iklan di kolom "TOP & PRO" beranda</li>
+          <li>✔️ Dibantu promosi di grup WA Kreatif ID</li>
+        </ul>
+      </div>
+    </details>
 
-    <h3>📜 Peraturan Vendor</h3>
-    <ul class="list-check">
-      <li>1️⃣ Dilarang upload karya orang lain (plagiat) → akun dihapus.</li>
-      <li>2️⃣ Dilarang pakai foto palsu.</li>
-      <li>3️⃣ Transaksi LANGSUNG dengan klien.</li>
-      <li>4️⃣ No HP klien bersifat RAHASIA.</li>
-      <li>5️⃣ Wajib profesional & tepat waktu.</li>
-      <li>6️⃣ Badge sesuai paket yang dibayar.</li>
-      <li>7️⃣ Klien berhak memberi ulasan.</li>
-      <li>8️⃣ Pelanggaran = suspend permanen tanpa refund.</li>
-    </ul>
+    <h3 style="margin-top:18px;">📜 Peraturan Vendor</h3>
+    <details class="accordion">
+      <summary>Baca Peraturan Lengkap</summary>
+      <div class="accordion-content">
+        <ul>
+          <li>1️⃣ Dilarang upload karya orang lain (plagiat) → akun dihapus.</li>
+          <li>2️⃣ Dilarang pakai foto palsu.</li>
+          <li>3️⃣ Transaksi LANGSUNG dengan klien.</li>
+          <li>4️⃣ No HP klien bersifat RAHASIA.</li>
+          <li>5️⃣ Wajib profesional & tepat waktu.</li>
+          <li>6️⃣ Badge sesuai paket yang dibayar.</li>
+          <li>7️⃣ Klien berhak memberi ulasan.</li>
+          <li>8️⃣ Pelanggaran = suspend permanen tanpa refund.</li>
+        </ul>
+      </div>
+    </details>
 
-    <h3>🖼️ Link Google Drive Portofolio</h3>
-    <div class="alert-box alert-warn">Siapkan folder Google Drive berisi foto karya Anda.<br><br>Cara share: Klik kanan folder → <b>Share</b> → ubah akses jadi <b>"Anyone with the link"</b> → <b>Copy link</b> → tempel di form daftar.<br><br>Kalau akses tidak dibuka, portofolio tidak akan muncul.</div>
+    <h3 style="margin-top:18px;">🖼️ Link Google Drive Portofolio</h3>
+    <div class="alert-box alert-warn">Siapkan folder Google Drive berisi foto karya Anda.<br><br>Cara share: Klik kanan folder → <b>Share</b> → ubah akses jadi <b>"Anyone with the link"</b> → <b>Copy link</b> → tempel di form daftar.</div>
 
     <button class="tombol-primary" onclick="goTo('daftar')">✅ Setuju & Lanjut Daftar</button>
     <button class="tombol-secondary" onclick="goBack()">← Kembali</button>
@@ -278,7 +443,7 @@ footer nav a { margin:0 6px; color:#4A90E2; cursor:pointer; display:inline-block
 
 <!-- DAFTAR VENDOR -->
 <div id="daftar" class="page">
-  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg> Kembali</button>
   <div class="form">
     <h1>📝 Daftar Vendor</h1>
     <label>Nama Usaha</label>
@@ -289,8 +454,9 @@ footer nav a { margin:0 6px; color:#4A90E2; cursor:pointer; display:inline-block
     <input type="text" id="kotaDaftar" placeholder="Contoh: Jakarta">
     <label>No WA</label>
     <input type="tel" id="waDaftar" placeholder="0812-xxxx-xxxx">
-    <label>Harga Mulai</label>
-    <input type="text" id="hargaDaftar" placeholder="Contoh: Rp500rb">
+    <label>Harga Mulai (angka saja)</label>
+    <input type="number" id="hargaDaftar" placeholder="Contoh: 500000" min="0" step="10000">
+    <p class="note" style="text-align:left; margin-top:4px;" id="hargaPreview">Rp 0</p>
     <label>Link Folder Google Drive Portofolio</label>
     <input type="url" id="driveDaftar" placeholder="https://drive.google.com/drive/folders/...">
     <p class="note" style="text-align:left;">*Harus link FOLDER. Akses wajib "Anyone with the link".</p>
@@ -323,7 +489,10 @@ footer nav a { margin:0 6px; color:#4A90E2; cursor:pointer; display:inline-block
 <!-- HOME -->
 <div id="home" class="page">
   <header>
-    <h1>🎨 Kreatif ID</h1>
+    <div class="header-greet">
+      <h1 id="homeGreeting">🎨 Kreatif ID</h1>
+      <p class="sub" id="homeSubgreet" style="display:none;">🎨 Kreatif ID</p>
+    </div>
     <nav>
       <a onclick="goTo('kategori-list')">Kategori</a>
       <a onclick="goTo('daftar')">Daftar</a>
@@ -365,21 +534,21 @@ footer nav a { margin:0 6px; color:#4A90E2; cursor:pointer; display:inline-block
 
 <!-- KATEGORI LIST -->
 <div id="kategori-list" class="page">
-  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg> Kembali</button>
   <h1 style="font-size:19px; color:#4A90E2; margin-bottom:14px;">📂 Semua Kategori</h1>
   <div class="kategori-grid" id="kategoriAll"></div>
 </div>
 
 <!-- KATEGORI DETAIL -->
 <div id="kategori-detail" class="page">
-  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg> Kembali</button>
   <h1 id="katDetailTitle" style="font-size:19px; color:#4A90E2; margin-bottom:14px;"></h1>
   <div id="katDetailList"></div>
 </div>
 
 <!-- PROFIL VENDOR -->
 <div id="profil" class="page">
-  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg> Kembali</button>
   <div id="profilContent"></div>
 </div>
 
@@ -387,8 +556,26 @@ footer nav a { margin:0 6px; color:#4A90E2; cursor:pointer; display:inline-block
 <div id="cari" class="page">
   <header><h1>🔍 Cari Jasa</h1></header>
   <div class="form">
-    <label>Cari nama / kategori / deskripsi</label>
+    <label>Kata kunci</label>
     <input type="text" id="searchInput" placeholder="Contoh: fotografer, MUA, WO..." oninput="doSearch()">
+    <div class="filter-row">
+      <div>
+        <label>Kota</label>
+        <select id="filterKota" onchange="doSearch()">
+          <option value="">Semua Kota</option>
+        </select>
+      </div>
+      <div>
+        <label>Range Harga</label>
+        <select id="filterHarga" onchange="doSearch()">
+          <option value="">Semua Harga</option>
+          <option value="0-300000">&lt; Rp300rb</option>
+          <option value="300000-1000000">Rp300rb - Rp1jt</option>
+          <option value="1000000-5000000">Rp1jt - Rp5jt</option>
+          <option value="5000000-999999999">&gt; Rp5jt</option>
+        </select>
+      </div>
+    </div>
   </div>
   <div id="searchResult"></div>
 </div>
@@ -399,29 +586,63 @@ footer nav a { margin:0 6px; color:#4A90E2; cursor:pointer; display:inline-block
   <div id="historyList"></div>
 </div>
 
-<!-- PROFIL USER -->
+<!-- ============ PROFIL USER (REDESIGN) ============ -->
 <div id="profil-user" class="page">
   <header><h1>👤 Profil Saya</h1></header>
-  <div class="form">
+
+  <!-- STATE 1: EMPTY -->
+  <div id="profilEmpty" class="form">
     <div class="profil-header">
-      <div class="profil-avatar" id="userAvatar">?</div>
+      <div class="profil-avatar">?</div>
       <div class="profil-info">
-        <h2 id="userNama">Belum diisi</h2>
-        <p id="userHP">No HP: -</p>
+        <h2>Belum diisi</h2>
+        <p>Lengkapi profil untuk mulai kontak vendor</p>
       </div>
     </div>
     <label>Nama Anda</label>
-    <input type="text" id="inputUserNama" placeholder="Nama Anda">
+    <input type="text" id="inputUserNama" placeholder="Contoh: Budi Santoso" maxlength="40">
     <label>No HP</label>
-    <input type="tel" id="inputUserHP" placeholder="0812-xxxx-xxxx">
-    <button class="tombol-primary" onclick="simpanUser()">Simpan</button>
-    <button class="tombol-secondary" onclick="clearUser()">Reset Data Lokal</button>
+    <input type="tel" id="inputUserHP" placeholder="0812-xxxx-xxxx" maxlength="16" inputmode="numeric">
+    <button class="tombol-primary" onclick="simpanUserBaru()">Simpan Profil</button>
+    <p class="note">🔒 Data hanya tersimpan di perangkat Anda.</p>
+  </div>
+
+  <!-- STATE 2: LOCKED -->
+  <div id="profilLocked" class="form" style="display:none;">
+    <div class="profil-locked">
+      <div class="profil-avatar-lg" id="lockedAvatar">B</div>
+      <h2 id="lockedNama">Budi Santoso</h2>
+      <p class="profil-hp" id="lockedHP">0812-****-7890</p>
+      <span class="verified-pill">✓ Profil Aktif</span>
+    </div>
+    <div class="profil-actions">
+      <button class="tombol-primary" onclick="masukModeEdit()">✏️ Ubah Data</button>
+      <button class="tombol-secondary" onclick="resetProfil()">🗑️ Reset Profil</button>
+      <button class="tombol-danger" onclick="hapusSemuaData()">⚠️ Hapus Semua Data</button>
+    </div>
+  </div>
+
+  <!-- STATE 3: EDIT -->
+  <div id="profilEdit" class="form" style="display:none;">
+    <div class="profil-header">
+      <div class="profil-avatar" id="editAvatar">B</div>
+      <div class="profil-info">
+        <h2>Ubah Data</h2>
+        <p>Perbarui informasi profil Anda</p>
+      </div>
+    </div>
+    <label>Nama Anda</label>
+    <input type="text" id="editUserNama" placeholder="Nama Anda" maxlength="40">
+    <label>No HP</label>
+    <input type="tel" id="editUserHP" placeholder="0812-xxxx-xxxx" maxlength="16" inputmode="numeric">
+    <button class="tombol-primary" onclick="simpanEditUser()">💾 Simpan Perubahan</button>
+    <button class="tombol-secondary" onclick="batalEdit()">Batal</button>
   </div>
 </div>
 
 <!-- ULASAN -->
 <div id="ulasan" class="page">
-  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg> Kembali</button>
   <div class="form">
     <h1>⭐ Kasih Ulasan</h1>
     <label>Vendor</label>
@@ -449,9 +670,9 @@ footer nav a { margin:0 6px; color:#4A90E2; cursor:pointer; display:inline-block
   </div>
 </div>
 
-<!-- PRIVACY -->
+<!-- PRIVACY / TOS / DISCLAIMER / TENTANG / FAQ / KONTAK (tetap sama) -->
 <div id="privacy" class="page">
-  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg> Kembali</button>
   <div class="dokumen">
     <h1>🔒 Privacy Policy</h1>
     <h2>1. Data yang Kami Kumpulkan</h2><ul><li>Nama</li><li>Email</li><li>No HP</li><li>Karya yang diupload</li></ul>
@@ -463,9 +684,8 @@ footer nav a { margin:0 6px; color:#4A90E2; cursor:pointer; display:inline-block
   </div>
 </div>
 
-<!-- TOS -->
 <div id="tos" class="page">
-  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg> Kembali</button>
   <div class="dokumen">
     <h1>📜 Syarat & Ketentuan</h1>
     <h2>1. Hak Cipta</h2><ul><li>Karya tetap milik pembuat</li><li>Kreatif ID hanya menampilkan</li></ul>
@@ -478,9 +698,8 @@ footer nav a { margin:0 6px; color:#4A90E2; cursor:pointer; display:inline-block
   </div>
 </div>
 
-<!-- DISCLAIMER -->
 <div id="disclaimer" class="page">
-  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg> Kembali</button>
   <div class="dokumen">
     <h1>⚠️ Disclaimer</h1>
     <p>Kreatif ID adalah platform yang mempertemukan penyedia jasa dengan pengguna. Kami TIDAK terlibat dalam transaksi.</p>
@@ -493,9 +712,8 @@ footer nav a { margin:0 6px; color:#4A90E2; cursor:pointer; display:inline-block
   </div>
 </div>
 
-<!-- TENTANG -->
 <div id="tentang" class="page">
-  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg> Kembali</button>
   <div class="dokumen">
     <h1>🎨 Tentang Kreatif ID</h1>
     <p>Platform yang menghubungkan penyedia jasa dengan klien di seluruh Indonesia.</p>
@@ -504,9 +722,8 @@ footer nav a { margin:0 6px; color:#4A90E2; cursor:pointer; display:inline-block
   </div>
 </div>
 
-<!-- FAQ -->
 <div id="faq" class="page">
-  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg> Kembali</button>
   <div class="dokumen">
     <h1>❓ FAQ</h1>
     <h2>Vendor</h2>
@@ -520,9 +737,8 @@ footer nav a { margin:0 6px; color:#4A90E2; cursor:pointer; display:inline-block
   </div>
 </div>
 
-<!-- KONTAK -->
 <div id="kontak" class="page">
-  <button class="back-btn" onclick="goBack()">← Kembali</button>
+  <button class="back-btn" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="15 18 9 12 15 6"/></svg> Kembali</button>
   <div class="dokumen">
     <h1>📞 Kontak</h1>
     <p>Email: admin@kreatif-id.com</p>
@@ -536,90 +752,153 @@ footer nav a { margin:0 6px; color:#4A90E2; cursor:pointer; display:inline-block
 
 <!-- BOTTOM NAV -->
 <nav class="bottom-nav">
-  <button id="nav-home" onclick="goTo('home')"><span class="ico">🏠</span>Home</button>
-  <button id="nav-cari" onclick="goTo('cari')"><span class="ico">🔍</span>Cari</button>
-  <button id="nav-history" onclick="goTo('history')"><span class="ico">📋</span>History</button>
-  <button id="nav-profil" onclick="goTo('profil-user')"><span class="ico">👤</span>Profil</button>
+  <button id="nav-home" onclick="goTo('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    Home
+  </button>
+  <button id="nav-cari" onclick="goTo('cari')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    Cari
+  </button>
+  <button id="nav-history" onclick="goTo('history')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+    History
+  </button>
+  <button id="nav-profil" onclick="goTo('profil-user')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profil
+  </button>
 </nav>
 
 <!-- MODAL HP -->
 <div id="modalHP" class="modal">
   <div class="modal-box">
     <h3>📱 Isi No HP Anda</h3>
-    <p>Sebelum menghubungi vendor, isi No HP untuk verifikasi & mencatat klik Anda. Tidak ditampilkan ke publik.</p>
-    <input type="tel" id="modalNoHP" placeholder="0812-xxxx-xxxx">
+    <p>Sebelum menghubungi vendor, isi No HP untuk verifikasi. Tidak ditampilkan ke publik.</p>
+    <input type="tel" id="modalNoHP" placeholder="0812-xxxx-xxxx" maxlength="16" inputmode="numeric">
     <button class="tombol-primary" onclick="submitModalHP()">Lanjut ke WA</button>
     <button class="tombol-secondary" onclick="closeModal()">Batal</button>
   </div>
 </div>
 
+<!-- TOAST CONTAINER -->
+<div id="toast-container"></div>
+
 <script>
 /* ============ API KEY DRIVE ============ */
 var DRIVE_API_KEY = "AIzaSyDFmr6CPgK6LnxchUTU0cP0BbOT98TEXz8";
 
-/* ============ DATA KATEGORI + VENDOR ============ */
+/* ============ DATA ============ */
 var KATEGORI = [
   { id:'kreatif-media', nama:'🎨 Kreatif & Media', vendors:[
-    { id:'ardi', nama:'Ardi Photography', kota:'Jakarta', harga:'Rp500rb', rating:4.8, badge:'TOP', desc:'Fotografer wedding & prewedding berpengalaman 5 tahun.', wa:'6281234567890', drive:'' },
-    { id:'budi', nama:'Budi Video', kota:'Bandung', harga:'Rp1jt', rating:4.7, badge:'PRO', desc:'Videografer cinematic, spesialis wedding.', wa:'6281234567891', drive:'' },
-    { id:'citra', nama:'Citra Design', kota:'Surabaya', harga:'Rp300rb', rating:4.5, badge:'STANDARD', desc:'Desain logo, banner, feed IG.', wa:'6281234567892', drive:'' },
-    { id:'dimas', nama:'Dimas Editor', kota:'Yogyakarta', harga:'Rp250rb', rating:4.4, badge:'STANDARD', desc:'Editing video TikTok, Reels, YouTube.', wa:'6281234567893', drive:'' }
+    { id:'ardi', nama:'Ardi Photography', kota:'Jakarta', harga:500000, rating:4.8, badge:'TOP', desc:'Fotografer wedding & prewedding berpengalaman 5 tahun.', wa:'6281234567890', drive:'' },
+    { id:'budi', nama:'Budi Video', kota:'Bandung', harga:1000000, rating:4.7, badge:'PRO', desc:'Videografer cinematic, spesialis wedding.', wa:'6281234567891', drive:'' },
+    { id:'citra', nama:'Citra Design', kota:'Surabaya', harga:300000, rating:4.5, badge:'STANDARD', desc:'Desain logo, banner, feed IG.', wa:'6281234567892', drive:'' },
+    { id:'dimas', nama:'Dimas Editor', kota:'Yogyakarta', harga:250000, rating:4.4, badge:'STANDARD', desc:'Editing video TikTok, Reels, YouTube.', wa:'6281234567893', drive:'' }
   ]},
   { id:'acara-event', nama:'🎉 Acara & Event', vendors:[
-    { id:'dewi', nama:'Dewi WO', kota:'Jakarta', harga:'Rp5jt', rating:4.6, badge:'PRO', desc:'Wedding organizer profesional, 100+ acara.', wa:'6281234567894', drive:'' },
-    { id:'eko', nama:'Eko MC', kota:'Semarang', harga:'Rp2jt', rating:4.5, badge:'STANDARD', desc:'MC pernikahan formal & santai.', wa:'6281234567895', drive:'' },
-    { id:'fani', nama:'Fani Dekor', kota:'Bali', harga:'Rp3jt', rating:4.9, badge:'TOP', desc:'Dekorasi pernikahan & event mewah.', wa:'6281234567896', drive:'' },
-    { id:'gita', nama:'Gita Catering', kota:'Medan', harga:'Rp50rb/pax', rating:4.3, badge:'STANDARD', desc:'Catering nusantara & prasmanan.', wa:'6281234567897', drive:'' }
+    { id:'dewi', nama:'Dewi WO', kota:'Jakarta', harga:5000000, rating:4.6, badge:'PRO', desc:'Wedding organizer profesional, 100+ acara.', wa:'6281234567894', drive:'' },
+    { id:'eko', nama:'Eko MC', kota:'Semarang', harga:2000000, rating:4.5, badge:'STANDARD', desc:'MC pernikahan formal & santai.', wa:'6281234567895', drive:'' },
+    { id:'fani', nama:'Fani Dekor', kota:'Bali', harga:3000000, rating:4.9, badge:'TOP', desc:'Dekorasi pernikahan & event mewah.', wa:'6281234567896', drive:'' },
+    { id:'gita', nama:'Gita Catering', kota:'Medan', harga:50000, rating:4.3, badge:'STANDARD', desc:'Catering nusantara & prasmanan.', wa:'6281234567897', drive:'' }
   ]},
   { id:'kecantikan', nama:'💄 Kecantikan', vendors:[
-    { id:'sarah', nama:'Sarah MUA', kota:'Bandung', harga:'Rp1jt', rating:4.9, badge:'TOP', desc:'Make up artist wedding & prewedding.', wa:'6281234567898', drive:'' },
-    { id:'hana', nama:'Hana Hair', kota:'Jakarta', harga:'Rp300rb', rating:4.7, badge:'PRO', desc:'Hair do & styling untuk acara.', wa:'6281234567899', drive:'' },
-    { id:'indah', nama:'Indah Spa', kota:'Bali', harga:'Rp200rb', rating:4.5, badge:'STANDARD', desc:'Spa & massage panggilan.', wa:'6281234567800', drive:'' }
+    { id:'sarah', nama:'Sarah MUA', kota:'Bandung', harga:1000000, rating:4.9, badge:'TOP', desc:'Make up artist wedding & prewedding.', wa:'6281234567898', drive:'' },
+    { id:'hana', nama:'Hana Hair', kota:'Jakarta', harga:300000, rating:4.7, badge:'PRO', desc:'Hair do & styling untuk acara.', wa:'6281234567899', drive:'' },
+    { id:'indah', nama:'Indah Spa', kota:'Bali', harga:200000, rating:4.5, badge:'STANDARD', desc:'Spa & massage panggilan.', wa:'6281234567800', drive:'' }
   ]},
   { id:'rumah-bangunan', nama:'🏠 Rumah & Bangunan', vendors:[
-    { id:'joko', nama:'Joko Kontraktor', kota:'Jakarta', harga:'Rp50jt', rating:4.6, badge:'PRO', desc:'Bangun & renovasi rumah.', wa:'6281234567801', drive:'' },
-    { id:'karya', nama:'Karya Interior', kota:'Surabaya', harga:'Rp20jt', rating:4.4, badge:'STANDARD', desc:'Desain interior minimalis & modern.', wa:'6281234567802', drive:'' },
-    { id:'lancar', nama:'Lancar Renovasi', kota:'Bekasi', harga:'Rp10jt', rating:4.3, badge:'STANDARD', desc:'Renovasi kamar mandi & dapur.', wa:'6281234567803', drive:'' }
+    { id:'joko', nama:'Joko Kontraktor', kota:'Jakarta', harga:50000000, rating:4.6, badge:'PRO', desc:'Bangun & renovasi rumah.', wa:'6281234567801', drive:'' },
+    { id:'karya', nama:'Karya Interior', kota:'Surabaya', harga:20000000, rating:4.4, badge:'STANDARD', desc:'Desain interior minimalis & modern.', wa:'6281234567802', drive:'' },
+    { id:'lancar', nama:'Lancar Renovasi', kota:'Bekasi', harga:10000000, rating:4.3, badge:'STANDARD', desc:'Renovasi kamar mandi & dapur.', wa:'6281234567803', drive:'' }
   ]},
   { id:'pendidikan', nama:'📚 Pendidikan', vendors:[
-    { id:'smart', nama:'Smart Les', kota:'Jakarta', harga:'Rp100rb/jam', rating:4.8, badge:'PRO', desc:'Les privat SD-SMA semua mapel.', wa:'6281234567804', drive:'' },
-    { id:'bimbel', nama:'Bimbel Cerdas', kota:'Bandung', harga:'Rp500rb/bln', rating:4.5, badge:'STANDARD', desc:'Bimbel intensif UTBK & CPNS.', wa:'6281234567805', drive:'' },
-    { id:'guru', nama:'Guru Privat ID', kota:'Online', harga:'Rp80rb/jam', rating:4.4, badge:'STANDARD', desc:'Les online matematika & fisika.', wa:'6281234567806', drive:'' }
+    { id:'smart', nama:'Smart Les', kota:'Jakarta', harga:100000, rating:4.8, badge:'PRO', desc:'Les privat SD-SMA semua mapel.', wa:'6281234567804', drive:'' },
+    { id:'bimbel', nama:'Bimbel Cerdas', kota:'Bandung', harga:500000, rating:4.5, badge:'STANDARD', desc:'Bimbel intensif UTBK & CPNS.', wa:'6281234567805', drive:'' },
+    { id:'guru', nama:'Guru Privat ID', kota:'Online', harga:80000, rating:4.4, badge:'STANDARD', desc:'Les online matematika & fisika.', wa:'6281234567806', drive:'' }
   ]},
   { id:'kesehatan', nama:'💪 Kesehatan', vendors:[
-    { id:'fisio', nama:'Fisio Sehat', kota:'Jakarta', harga:'Rp250rb', rating:4.7, badge:'PRO', desc:'Fisioterapi panggilan.', wa:'6281234567807', drive:'' },
-    { id:'care', nama:'Care Perawat', kota:'Surabaya', harga:'Rp150rb/hari', rating:4.5, badge:'STANDARD', desc:'Perawat lansia & pasca operasi.', wa:'6281234567808', drive:'' },
-    { id:'yoga', nama:'Yoga Studio', kota:'Bali', harga:'Rp100rb', rating:4.6, badge:'STANDARD', desc:'Kelas yoga privat & grup.', wa:'6281234567809', drive:'' }
+    { id:'fisio', nama:'Fisio Sehat', kota:'Jakarta', harga:250000, rating:4.7, badge:'PRO', desc:'Fisioterapi panggilan.', wa:'6281234567807', drive:'' },
+    { id:'care', nama:'Care Perawat', kota:'Surabaya', harga:150000, rating:4.5, badge:'STANDARD', desc:'Perawat lansia & pasca operasi.', wa:'6281234567808', drive:'' },
+    { id:'yoga', nama:'Yoga Studio', kota:'Bali', harga:100000, rating:4.6, badge:'STANDARD', desc:'Kelas yoga privat & grup.', wa:'6281234567809', drive:'' }
   ]},
   { id:'digital', nama:'💻 Digital', vendors:[
-    { id:'webpro', nama:'Web Pro ID', kota:'Jakarta', harga:'Rp5jt', rating:4.9, badge:'TOP', desc:'Jasa pembuatan website & toko online.', wa:'6281234567810', drive:'' },
-    { id:'seo', nama:'SEO Master', kota:'Bandung', harga:'Rp2jt/bln', rating:4.6, badge:'PRO', desc:'SEO & Google Ads.', wa:'6281234567811', drive:'' },
-    { id:'sosmed', nama:'Sosmed Manager', kota:'Online', harga:'Rp1jt/bln', rating:4.4, badge:'STANDARD', desc:'Kelola IG, TikTok, FB brand Anda.', wa:'6281234567812', drive:'' }
+    { id:'webpro', nama:'Web Pro ID', kota:'Jakarta', harga:5000000, rating:4.9, badge:'TOP', desc:'Jasa pembuatan website & toko online.', wa:'6281234567810', drive:'' },
+    { id:'seo', nama:'SEO Master', kota:'Bandung', harga:2000000, rating:4.6, badge:'PRO', desc:'SEO & Google Ads.', wa:'6281234567811', drive:'' },
+    { id:'sosmed', nama:'Sosmed Manager', kota:'Online', harga:1000000, rating:4.4, badge:'STANDARD', desc:'Kelola IG, TikTok, FB brand Anda.', wa:'6281234567812', drive:'' }
   ]},
   { id:'transport', nama:'🚗 Transport', vendors:[
-    { id:'sewamobil', nama:'Sewa Mobil Jaya', kota:'Jakarta', harga:'Rp350rb/hari', rating:4.5, badge:'PRO', desc:'Sewa mobil + driver.', wa:'6281234567813', drive:'' },
-    { id:'driver', nama:'Driver Bandung', kota:'Bandung', harga:'Rp200rb', rating:4.4, badge:'STANDARD', desc:'Driver harian & antar kota.', wa:'6281234567814', drive:'' },
-    { id:'travel', nama:'Travel Antar Kota', kota:'Surabaya', harga:'Rp150rb', rating:4.3, badge:'STANDARD', desc:'Travel Surabaya-Malang-Jakarta.', wa:'6281234567815', drive:'' }
+    { id:'sewamobil', nama:'Sewa Mobil Jaya', kota:'Jakarta', harga:350000, rating:4.5, badge:'PRO', desc:'Sewa mobil + driver.', wa:'6281234567813', drive:'' },
+    { id:'driver', nama:'Driver Bandung', kota:'Bandung', harga:200000, rating:4.4, badge:'STANDARD', desc:'Driver harian & antar kota.', wa:'6281234567814', drive:'' },
+    { id:'travel', nama:'Travel Antar Kota', kota:'Surabaya', harga:150000, rating:4.3, badge:'STANDARD', desc:'Travel Surabaya-Malang-Jakarta.', wa:'6281234567815', drive:'' }
   ]},
   { id:'kuliner', nama:'🍽️ Kuliner', vendors:[
-    { id:'dapur', nama:'Dapur Nusantara', kota:'Jakarta', harga:'Rp30rb/pax', rating:4.7, badge:'PRO', desc:'Catering harian & acara.', wa:'6281234567816', drive:'' },
-    { id:'kue', nama:'Kue Manis', kota:'Bandung', harga:'Rp100rb', rating:4.5, badge:'STANDARD', desc:'Kue ulang tahun & hantaran.', wa:'6281234567817', drive:'' },
-    { id:'kateringsehat', nama:'Katering Sehat', kota:'Bali', harga:'Rp45rb/pax', rating:4.4, badge:'STANDARD', desc:'Katering diet & sehat.', wa:'6281234567818', drive:'' }
+    { id:'dapur', nama:'Dapur Nusantara', kota:'Jakarta', harga:30000, rating:4.7, badge:'PRO', desc:'Catering harian & acara.', wa:'6281234567816', drive:'' },
+    { id:'kue', nama:'Kue Manis', kota:'Bandung', harga:100000, rating:4.5, badge:'STANDARD', desc:'Kue ulang tahun & hantaran.', wa:'6281234567817', drive:'' },
+    { id:'kateringsehat', nama:'Katering Sehat', kota:'Bali', harga:45000, rating:4.4, badge:'STANDARD', desc:'Katering diet & sehat.', wa:'6281234567818', drive:'' }
   ]},
   { id:'otomotif', nama:'🔧 Otomotif', vendors:[
-    { id:'bengkel', nama:'Bengkel Maju', kota:'Jakarta', harga:'Rp100rb', rating:4.6, badge:'PRO', desc:'Servis mobil semua merk.', wa:'6281234567819', drive:'' },
-    { id:'cuci', nama:'Cuci Mobil Kilat', kota:'Bandung', harga:'Rp50rb', rating:4.4, badge:'STANDARD', desc:'Cuci mobil panggilan.', wa:'6281234567820', drive:'' },
-    { id:'servismotor', nama:'Servis Motor Jaya', kota:'Semarang', harga:'Rp75rb', rating:4.3, badge:'STANDARD', desc:'Servis motor panggilan.', wa:'6281234567821', drive:'' }
+    { id:'bengkel', nama:'Bengkel Maju', kota:'Jakarta', harga:100000, rating:4.6, badge:'PRO', desc:'Servis mobil semua merk.', wa:'6281234567819', drive:'' },
+    { id:'cuci', nama:'Cuci Mobil Kilat', kota:'Bandung', harga:50000, rating:4.4, badge:'STANDARD', desc:'Cuci mobil panggilan.', wa:'6281234567820', drive:'' },
+    { id:'servismotor', nama:'Servis Motor Jaya', kota:'Semarang', harga:75000, rating:4.3, badge:'STANDARD', desc:'Servis motor panggilan.', wa:'6281234567821', drive:'' }
   ]},
   { id:'amal-sosial', nama:'🆕 Amal & Sosial', vendors:[
-    { id:'yayasan', nama:'Yayasan Peduli', kota:'Jakarta', harga:'Donasi', rating:4.8, badge:'STANDARD', desc:'Penyaluran donasi & santunan.', wa:'6281234567822', drive:'' },
-    { id:'panti', nama:'Panti Asuhan Kasih', kota:'Bandung', harga:'Donasi', rating:4.7, badge:'STANDARD', desc:'Panti asuhan & pendidikan gratis.', wa:'6281234567823', drive:'' }
+    { id:'yayasan', nama:'Yayasan Peduli', kota:'Jakarta', harga:0, rating:4.8, badge:'STANDARD', desc:'Penyaluran donasi & santunan.', wa:'6281234567822', drive:'' },
+    { id:'panti', nama:'Panti Asuhan Kasih', kota:'Bandung', harga:0, rating:4.7, badge:'STANDARD', desc:'Panti asuhan & pendidikan gratis.', wa:'6281234567823', drive:'' }
   ]},
   { id:'lainnya', nama:'🆕 Jasa Lainnya', vendors:[
-    { id:'pindahan', nama:'Jasa Pindahan', kota:'Jakarta', harga:'Rp500rb', rating:4.4, badge:'STANDARD', desc:'Pindahan rumah & kantor.', wa:'6281234567824', drive:'' },
-    { id:'bersih', nama:'Jasa Bersih Rumah', kota:'Bandung', harga:'Rp150rb', rating:4.5, badge:'STANDARD', desc:'Bersih rumah & apartemen.', wa:'6281234567825', drive:'' }
+    { id:'pindahan', nama:'Jasa Pindahan', kota:'Jakarta', harga:500000, rating:4.4, badge:'STANDARD', desc:'Pindahan rumah & kantor.', wa:'6281234567824', drive:'' },
+    { id:'bersih', nama:'Jasa Bersih Rumah', kota:'Bandung', harga:150000, rating:4.5, badge:'STANDARD', desc:'Bersih rumah & apartemen.', wa:'6281234567825', drive:'' }
   ]}
 ];
+
+/* ============ TOAST SYSTEM (NEW) ============ */
+function showToast(message, type, duration) {
+  type = type || 'info';
+  duration = duration || 2800;
+  var container = document.getElementById('toast-container');
+  if (!container) return;
+  var icons = { success:'✅', error:'❌', warning:'⚠️', info:'ℹ️' };
+  var toast = document.createElement('div');
+  toast.className = 'toast ' + type;
+  toast.innerHTML = '<span class="toast-icon">' + (icons[type] || 'ℹ️') + '</span><span>' + message + '</span>';
+  container.appendChild(toast);
+  setTimeout(function() {
+    toast.classList.add('hide');
+    setTimeout(function() { toast.remove(); }, 300);
+  }, duration);
+}
+
+/* ============ HELPERS ============ */
+function formatRupiah(n) {
+  if (!n || n === 0) return 'Donasi';
+  if (n >= 1000000) return 'Rp' + (n/1000000).toFixed(n % 1000000 === 0 ? 0 : 1) + 'jt';
+  if (n >= 1000) return 'Rp' + Math.round(n/1000) + 'rb';
+  return 'Rp' + n;
+}
+function esc(str) {
+  return String(str || '').replace(/[&<>"']/g, function(m) {
+    return { '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m];
+  });
+}
+
+/* Format HP Indonesia: 08xx / +628xx / 628xx → simpan sebagai 08xx */
+function normalizeHP(hp) {
+  var b = String(hp || '').replace(/[^0-9]/g, '');
+  if (b.startsWith('62')) b = '0' + b.slice(2);
+  return b;
+}
+function validasiHP(hp) {
+  var b = normalizeHP(hp);
+  return /^08[0-9]{8,11}$/.test(b);
+}
+function maskHP(hp) {
+  var b = normalizeHP(hp);
+  if (b.length < 8) return hp;
+  var awal = b.slice(0, 4);
+  var akhir = b.slice(-4);
+  return awal + '-****-' + akhir;
+}
 
 /* ============ NAVIGASI ============ */
 var currentPage = null;
@@ -636,6 +915,10 @@ function showPage(id) {
   next.scrollTop = 0;
   currentPage = id;
   updateNav(id);
+  // AUTO REFRESH berdasarkan halaman
+  if (id === 'profil-user') refreshProfilUser();
+  if (id === 'home') refreshGreeting();
+  if (id === 'history') renderHistory();
 }
 
 function goTo(id) {
@@ -644,14 +927,11 @@ function goTo(id) {
   showPage(id);
   try { history.pushState({ page: id }, '', '#' + id); } catch(e) {}
 }
-
 function goBack() {
   if (navStack.length <= 1) return;
   navStack.pop();
-  var prev = navStack[navStack.length - 1];
-  showPage(prev);
+  showPage(navStack[navStack.length - 1]);
 }
-
 function updateNav(id) {
   document.querySelectorAll('.bottom-nav button').forEach(function(b) { b.classList.remove('active'); });
   if (id === 'home') document.getElementById('nav-home').classList.add('active');
@@ -659,7 +939,6 @@ function updateNav(id) {
   else if (id === 'history') document.getElementById('nav-history').classList.add('active');
   else if (id === 'profil-user') document.getElementById('nav-profil').classList.add('active');
 }
-
 window.addEventListener('popstate', function() {
   if (navStack.length > 1) {
     navStack.pop();
@@ -685,7 +964,7 @@ window.addEventListener('load', function() {
     var s = document.getElementById('splash');
     if (s) {
       s.classList.add('hide');
-      setTimeout(function() { s.style.display = 'none'; }, 400);
+      setTimeout(function() { s.style.display = 'none'; }, 450);
     }
     goTo('onboarding');
   }, 1800);
@@ -693,7 +972,6 @@ window.addEventListener('load', function() {
 
 /* ============ DRIVE API ============ */
 var driveReady = false;
-
 function initDrive() {
   if (!DRIVE_API_KEY || DRIVE_API_KEY.length < 20) return;
   if (typeof gapi === 'undefined') return;
@@ -704,9 +982,7 @@ function initDrive() {
     }).then(function() {
       driveReady = true;
       console.log("✅ Drive API siap");
-    }).catch(function(err) {
-      console.warn("Drive init gagal:", err);
-    });
+    }).catch(function(err) { console.warn("Drive init gagal:", err); });
   });
 }
 initDrive();
@@ -719,36 +995,47 @@ function extractFolderId(url) {
   if (m) return m[1];
   return null;
 }
-
+function showSkeleton(el, count) {
+  var html = '';
+  for (var i = 0; i < (count || 6); i++) html += '<div class="skeleton skeleton-box"></div>';
+  el.innerHTML = html;
+}
 async function loadDrivePorto(folderUrl, el) {
   var fid = extractFolderId(folderUrl);
   if (!fid) {
-    el.innerHTML = '<p style="color:#999;font-size:12px;grid-column:1/-1">Link Drive tidak valid.</p>';
+    el.innerHTML = '<p style="color:#999;font-size:12px;grid-column:1/-1;text-align:center;padding:20px 0;">Link Drive tidak valid.</p>';
     return;
   }
-  if (driveReady) {
-    try {
-      var res = await gapi.client.drive.files.list({
-        q: "'" + fid + "' in parents and mimeType contains 'image/' and trashed=false",
-        fields: "files(id,name,thumbnailLink,webViewLink)",
-        pageSize: 30
-      });
-      var files = res.result.files || [];
-      if (!files.length) {
-        el.innerHTML = '<p style="color:#999;font-size:12px;grid-column:1/-1">Folder kosong / tidak ada gambar.</p>';
-        return;
-      }
-      el.innerHTML = files.map(function(f) {
-        var thumb = f.thumbnailLink ? f.thumbnailLink.replace(/=s\d+/, '=s400') : '';
-        return '<a href="' + f.webViewLink + '" target="_blank" rel="noopener">' +
-          (thumb ? '<img src="' + thumb + '" loading="lazy" alt="">' : '🖼️') + '</a>';
-      }).join('');
-      return;
-    } catch(e) {
-      console.warn("Drive API gagal, fallback iframe:", e);
+  showSkeleton(el, 6);
+  if (!driveReady) {
+    var waited = 0;
+    while (!driveReady && waited < 3000) {
+      await new Promise(r => setTimeout(r, 200)); waited += 200;
     }
   }
-  el.innerHTML = '<iframe src="https://drive.google.com/embeddedfolderview?id=' + fid + '#grid" style="width:100%;height:380px;border:0;border-radius:12px;grid-column:1/-1" loading="lazy"></iframe>';
+  if (!driveReady) {
+    el.innerHTML = '<p style="color:#999;font-size:12px;grid-column:1/-1;text-align:center;padding:20px 0;">Gagal memuat portofolio. Coba refresh halaman.</p>';
+    return;
+  }
+  try {
+    var res = await gapi.client.drive.files.list({
+      q: "'" + fid + "' in parents and mimeType contains 'image/' and trashed=false",
+      fields: "files(id,name,thumbnailLink,webViewLink)", pageSize: 30
+    });
+    var files = res.result.files || [];
+    if (!files.length) {
+      el.innerHTML = '<p style="color:#999;font-size:12px;grid-column:1/-1;text-align:center;padding:20px 0;">Folder kosong / tidak ada gambar.</p>';
+      return;
+    }
+    el.innerHTML = files.map(function(f) {
+      var thumb = f.thumbnailLink ? f.thumbnailLink.replace(/=s\d+/, '=s400') : '';
+      return '<a href="' + f.webViewLink + '" target="_blank" rel="noopener">' +
+        (thumb ? '<img src="' + thumb + '" loading="lazy" alt="">' : '<span>🖼️</span>') + '</a>';
+    }).join('');
+  } catch(e) {
+    console.warn("Drive API gagal:", e);
+    el.innerHTML = '<p style="color:#999;font-size:12px;grid-column:1/-1;text-align:center;padding:20px 0;">Gagal memuat. Pastikan folder Drive di-share "Anyone with the link".</p>';
+  }
 }
 
 /* ============ RENDER KATEGORI ============ */
@@ -756,7 +1043,7 @@ function renderKategoriGrid(cid) {
   var el = document.getElementById(cid);
   if (!el) return;
   el.innerHTML = KATEGORI.map(function(k) {
-    return '<button onclick="bukaKategori(\'' + k.id + '\')">' + k.nama + '</button>';
+    return '<button onclick="bukaKategori(\'' + k.id + '\')">' + esc(k.nama) + '</button>';
   }).join('');
 }
 renderKategoriGrid('kategoriHome');
@@ -766,9 +1053,19 @@ renderKategoriGrid('kategoriAll');
   var sel = document.getElementById('kategoriDaftar');
   if (sel) {
     sel.innerHTML = KATEGORI.map(function(k) {
-      return '<option value="' + k.id + '">' + k.nama + '</option>';
+      return '<option value="' + k.id + '">' + esc(k.nama) + '</option>';
     }).join('');
   }
+})();
+
+(function initFilterKota() {
+  var sel = document.getElementById('filterKota');
+  if (!sel) return;
+  var kotaSet = {};
+  KATEGORI.forEach(function(k) { k.vendors.forEach(function(v) { kotaSet[v.kota] = true; }); });
+  var kotaList = Object.keys(kotaSet).sort();
+  sel.innerHTML = '<option value="">Semua Kota</option>' +
+    kotaList.map(function(k) { return '<option value="' + esc(k) + '">' + esc(k) + '</option>'; }).join('');
 })();
 
 function bukaKategori(id) {
@@ -782,11 +1079,11 @@ function bukaKategori(id) {
     list.innerHTML = kat.vendors.map(function(v) {
       var bc = 'badge-' + v.badge.toLowerCase();
       return '<div class="vendor-list-item" onclick="bukaProfil(\'' + kat.id + '\',\'' + v.id + '\')">' +
-        '<div class="vendor-list-avatar">' + v.nama.charAt(0) + '</div>' +
+        '<div class="vendor-list-avatar">' + esc(v.nama.charAt(0)) + '</div>' +
         '<div class="vendor-list-info">' +
-          '<h3>' + v.nama + ' <span class="badge ' + bc + '">' + v.badge + '</span></h3>' +
-          '<p>📍 ' + v.kota + ' | 💰 ' + v.harga + ' | ⭐ ' + v.rating + '</p>' +
-          '<p>' + v.desc + '</p>' +
+          '<h3>' + esc(v.nama) + ' <span class="badge ' + bc + '">' + v.badge + '</span></h3>' +
+          '<p>📍 ' + esc(v.kota) + ' | 💰 ' + formatRupiah(v.harga) + ' | ⭐ ' + v.rating + '</p>' +
+          '<p>' + esc(v.desc) + '</p>' +
         '</div>' +
       '</div>';
     }).join('');
@@ -803,34 +1100,29 @@ function bukaProfil(katId, vId) {
   var v = kat.vendors.find(function(x) { return x.id === vId; });
   if (!v) return;
   currentVendor = v;
-
   var bc = 'badge-' + v.badge.toLowerCase();
-  var portoHtml = '';
-  for (var i = 0; i < 6; i++) portoHtml += '<div>🖼️</div>';
-
   var ulasan = [
     { nama: 'Budi', tgl: '15 Des 2026', b: 5, isi: 'Pelayanan bagus, profesional!' },
     { nama: 'Siti', tgl: '20 Des 2026', b: 5, isi: 'Ramah, tepat waktu!' }
   ];
   var uHtml = ulasan.map(function(u) {
     return '<div class="ulasan-item">' +
-      '<p class="nama">' + u.nama + ' - ' + u.tgl + '</p>' +
-      '<p>' + '⭐'.repeat(u.b) + ' "' + u.isi + '"</p>' +
+      '<p class="nama">' + esc(u.nama) + ' - ' + u.tgl + '</p>' +
+      '<p>' + '⭐'.repeat(u.b) + ' "' + esc(u.isi) + '"</p>' +
       '<button class="tombol-lapor" onclick="lapor()">🚨 Lapor</button>' +
     '</div>';
   }).join('');
-
   document.getElementById('profilContent').innerHTML =
     '<div class="profil-card">' +
       '<div class="profil-header">' +
-        '<div class="profil-avatar">' + v.nama.charAt(0) + '</div>' +
+        '<div class="profil-avatar">' + esc(v.nama.charAt(0)) + '</div>' +
         '<div class="profil-info">' +
-          '<h2>' + v.nama + '</h2>' +
+          '<h2>' + esc(v.nama) + '</h2>' +
           '<p><span class="badge ' + bc + '">' + v.badge + '</span> ⭐ ' + v.rating + '</p>' +
         '</div>' +
       '</div>' +
-      '<p style="font-size:13px; color:#666; margin-bottom:8px;">📍 ' + v.kota + ' | 💰 Mulai ' + v.harga + '</p>' +
-      '<p style="font-size:13px; color:#666;">' + v.desc + '</p>' +
+      '<p style="font-size:13px; color:#666; margin-bottom:8px;">📍 ' + esc(v.kota) + ' | 💰 Mulai ' + formatRupiah(v.harga) + '</p>' +
+      '<p style="font-size:13px; color:#666;">' + esc(v.desc) + '</p>' +
       '<div class="tombol">' +
         '<button class="tombol-wa" onclick="kontakVendor(\'WA\')">📱 WA</button>' +
         '<button class="tombol-ig" onclick="kontakVendor(\'IG\')">📷 IG</button>' +
@@ -839,23 +1131,21 @@ function bukaProfil(katId, vId) {
     '</div>' +
     '<div class="form">' +
       '<h3>📸 Portofolio</h3>' +
-      '<div class="portofolio-grid" id="portoDrive">' + portoHtml + '</div>' +
+      '<div class="portofolio-grid" id="portoDrive"></div>' +
       (v.drive ? '<button class="tombol-secondary" style="margin-top:10px;" onclick="window.open(\'' + v.drive + '\',\'_blank\')">📂 Buka Lengkap di Drive</button>' : '') +
     '</div>' +
     '<div class="form">' +
-      '<h3>⭐ Ulasan</h3>' +
-      uHtml +
+      '<h3>⭐ Ulasan</h3>' + uHtml +
       '<button class="tombol-primary" style="margin-top:10px;" onclick="bukaUlasan()">Tulis Ulasan</button>' +
     '</div>';
-
   goTo('profil');
-
   setTimeout(function() {
     var el = document.getElementById('portoDrive');
     if (!el) return;
-    if (v.drive) {
-      el.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:#999;font-size:12px;">Memuat portofolio…</div>';
-      loadDrivePorto(v.drive, el);
+    if (v.drive) { loadDrivePorto(v.drive, el); }
+    else {
+      var ph = ''; for (var i = 0; i < 6; i++) ph += '<div>🖼️</div>';
+      el.innerHTML = ph;
     }
   }, 60);
 }
@@ -873,45 +1163,42 @@ function kontakVendor(aksi) {
     document.getElementById('modalNoHP').value = '';
   }
 }
-
 function closeModal() {
   document.getElementById('modalHP').classList.remove('show');
   pendingAction = null;
 }
-
 async function submitModalHP() {
   var hp = document.getElementById('modalNoHP').value.trim();
-  if (!hp || hp.length < 8) { alert('Isi No HP yang valid dulu ya!'); return; }
-  localStorage.setItem('klienNoHP', hp);
+  if (!validasiHP(hp)) {
+    showToast('Format No HP tidak valid. Contoh: 08123456789', 'error');
+    return;
+  }
+  var hpBersih = normalizeHP(hp);
+  localStorage.setItem('klienNoHP', hpBersih);
   document.getElementById('modalHP').classList.remove('show');
-
   if (window.firebaseReady && currentVendor) {
     try {
       await window.addDoc(window.collection(window.db, 'klik'), {
-        noHP: hp, vendor: currentVendor.nama, aksi: pendingAction || 'WA', tanggal: new Date()
+        noHP: hpBersih, vendor: currentVendor.nama, aksi: pendingAction || 'WA', tanggal: new Date()
       });
     } catch(e) { console.warn(e); }
   }
-
   var h = JSON.parse(localStorage.getItem('history') || '[]');
-  h.push({
-    vendor: currentVendor ? currentVendor.nama : 'Vendor',
-    tanggal: new Date().toISOString(),
-    noHP: hp,
-    aksi: pendingAction || 'WA'
-  });
+  h.push({ vendor: currentVendor ? currentVendor.nama : 'Vendor', tanggal: new Date().toISOString(), noHP: hpBersih, aksi: pendingAction || 'WA' });
   localStorage.setItem('history', JSON.stringify(h));
   renderHistory();
-
-  doKontak(pendingAction, hp);
+  doKontak(pendingAction, hpBersih);
   pendingAction = null;
+  refreshProfilUser();
 }
 
 function doKontak(aksi, noHP) {
   if (!currentVendor) return;
   var v = currentVendor;
+  var klienNama = localStorage.getItem('klienNama') || 'seorang klien';
   if (aksi === 'WA') {
-    var p = encodeURIComponent('Halo ' + v.nama + ', saya dari Kreatif ID. Saya tertarik dengan jasa Anda.');
+    var pesan = 'Halo ' + v.nama + ', saya ' + klienNama + ' dari Kreatif ID. Saya tertarik dengan jasa Anda.';
+    var p = encodeURIComponent(pesan);
     window.location.href = 'https://wa.me/' + v.wa + '?text=' + p;
   } else if (aksi === 'IG') {
     window.open('https://instagram.com/' + v.nama.toLowerCase().replace(/[^a-z0-9]/g, ''), '_blank');
@@ -933,7 +1220,6 @@ var iklan3 = [
   { nama: 'Info Kreatif ID', badge: 'INFO', rating: '-', kat: null, id: null },
   { nama: 'New Member', badge: 'NEW', rating: '-', kat: null, id: null }
 ];
-
 function renderIklan(cid, data) {
   var c = document.getElementById(cid);
   if (!c) return;
@@ -943,7 +1229,7 @@ function renderIklan(cid, data) {
     if (item.badge === 'INFO') bc = 'badge-info';
     else if (item.badge === 'NEW') bc = 'badge-new';
     return '<div class="iklan-card" ' + oc + '>' +
-      '<h3>' + item.nama + '</h3>' +
+      '<h3>' + esc(item.nama) + '</h3>' +
       '<p><span class="badge ' + bc + '">' + item.badge + '</span> ⭐ ' + item.rating + '</p>' +
     '</div>';
   }).join('');
@@ -955,26 +1241,37 @@ renderIklan('kolom3', iklan3);
 /* ============ SEARCH ============ */
 function doSearch() {
   var q = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+  var kotaFilter = document.getElementById('filterKota').value;
+  var hargaFilter = document.getElementById('filterHarga').value;
   var res = document.getElementById('searchResult');
-  if (!q) { res.innerHTML = ''; return; }
   var hasil = [];
   KATEGORI.forEach(function(kat) {
     kat.vendors.forEach(function(v) {
-      if (v.nama.toLowerCase().includes(q) || kat.nama.toLowerCase().includes(q) || v.desc.toLowerCase().includes(q)) {
-        hasil.push({ kat: kat.id, v: v });
+      var matchQ = !q || v.nama.toLowerCase().includes(q) || kat.nama.toLowerCase().includes(q) || v.desc.toLowerCase().includes(q) || v.kota.toLowerCase().includes(q);
+      var matchKota = !kotaFilter || v.kota === kotaFilter;
+      var matchHarga = true;
+      if (hargaFilter) {
+        var parts = hargaFilter.split('-');
+        matchHarga = v.harga >= parseInt(parts[0]) && v.harga <= parseInt(parts[1]);
       }
+      if (matchQ && matchKota && matchHarga) hasil.push({ kat: kat.id, v: v });
     });
   });
+  if (!q && !kotaFilter && !hargaFilter) {
+    res.innerHTML = '<p class="empty">Ketik kata kunci atau pilih filter untuk mulai mencari.</p>';
+    return;
+  }
   if (!hasil.length) {
-    res.innerHTML = '<p class="empty">Tidak ditemukan. Coba kata lain.</p>';
+    res.innerHTML = '<p class="empty">Tidak ditemukan. Coba kata kunci atau filter lain.</p>';
     return;
   }
   res.innerHTML = hasil.map(function(h) {
+    var bc = 'badge-' + h.v.badge.toLowerCase();
     return '<div class="vendor-list-item" onclick="bukaProfil(\'' + h.kat + '\',\'' + h.v.id + '\')">' +
-      '<div class="vendor-list-avatar">' + h.v.nama.charAt(0) + '</div>' +
+      '<div class="vendor-list-avatar">' + esc(h.v.nama.charAt(0)) + '</div>' +
       '<div class="vendor-list-info">' +
-        '<h3>' + h.v.nama + '</h3>' +
-        '<p>📍 ' + h.v.kota + ' | ⭐ ' + h.v.rating + '</p>' +
+        '<h3>' + esc(h.v.nama) + ' <span class="badge ' + bc + '">' + h.v.badge + '</span></h3>' +
+        '<p>📍 ' + esc(h.v.kota) + ' | 💰 ' + formatRupiah(h.v.harga) + ' | ⭐ ' + h.v.rating + '</p>' +
       '</div>' +
     '</div>';
   }).join('');
@@ -991,9 +1288,9 @@ function renderHistory() {
   }
   c.innerHTML = data.slice().reverse().map(function(item) {
     return '<div class="history-item">' +
-      '<h3>' + item.vendor + '</h3>' +
-      '<p>' + new Date(item.tanggal).toLocaleString('id-ID') + ' • ' + (item.aksi || 'klik') + '</p>' +
-      '<button onclick="bukaUlasanDariHistory(\'' + item.vendor.replace(/'/g, "\\'") + '\')">Kasih Ulasan</button>' +
+      '<h3>' + esc(item.vendor) + '</h3>' +
+      '<p>' + new Date(item.tanggal).toLocaleString('id-ID') + ' • ' + esc(item.aksi || 'klik') + '</p>' +
+      '<button onclick="bukaUlasanDariHistory(\'' + esc(item.vendor).replace(/'/g, "\\'") + '\')">Kasih Ulasan</button>' +
     '</div>';
   }).join('');
 }
@@ -1001,16 +1298,11 @@ renderHistory();
 
 /* ============ ULASAN ============ */
 var ratingValue = 0;
-
 function setRating(n) {
   ratingValue = n;
-  document.querySelectorAll('#rating span').forEach(function(s, i) {
-    s.classList.toggle('active', i < n);
-  });
+  document.querySelectorAll('#rating span').forEach(function(s, i) { s.classList.toggle('active', i < n); });
 }
-
 var currentVendorNama = '';
-
 function bukaUlasan() {
   if (!currentVendor) return;
   currentVendorNama = currentVendor.nama;
@@ -1019,7 +1311,6 @@ function bukaUlasan() {
   document.getElementById('noHPUlasan').value = localStorage.getItem('klienNoHP') || '';
   goTo('ulasan');
 }
-
 function bukaUlasanDariHistory(vendor) {
   currentVendorNama = vendor;
   document.getElementById('vendorUlasan').value = vendor;
@@ -1027,19 +1318,19 @@ function bukaUlasanDariHistory(vendor) {
   document.getElementById('noHPUlasan').value = localStorage.getItem('klienNoHP') || '';
   goTo('ulasan');
 }
-
 async function kirimUlasan() {
   var nama = document.getElementById('nama').value.trim();
   var noHP = document.getElementById('noHPUlasan').value.trim();
   var email = document.getElementById('email').value.trim();
   var tgl = document.getElementById('tanggalAcara').value;
   var komentar = document.getElementById('komentar').value.trim();
-  if (!nama || !noHP) { alert('Isi nama & No HP dulu!'); return; }
-  if (ratingValue === 0) { alert('Pilih rating dulu!'); return; }
+  if (!nama || nama.length < 2) { showToast('Nama minimal 2 karakter', 'error'); return; }
+  if (!validasiHP(noHP)) { showToast('Format No HP tidak valid', 'error'); return; }
+  if (ratingValue === 0) { showToast('Pilih rating bintang dulu', 'warning'); return; }
   if (window.firebaseReady) {
     try {
       await window.addDoc(window.collection(window.db, 'reviews'), {
-        nama: nama, noHP: noHP, email: email,
+        nama: nama, noHP: normalizeHP(noHP), email: email,
         rating: ratingValue, komentar: komentar,
         tanggalAcara: tgl, vendor: currentVendorNama || 'Vendor',
         createdAt: new Date()
@@ -1047,90 +1338,164 @@ async function kirimUlasan() {
     } catch(e) { console.warn(e); }
   }
   localStorage.setItem('klienNama', nama);
-  localStorage.setItem('klienNoHP', noHP);
-  alert('Ulasan terkirim! Terima kasih 🙏');
-  goTo('history');
+  localStorage.setItem('klienNoHP', normalizeHP(noHP));
+  showToast('Ulasan berhasil terkirim. Terima kasih!', 'success');
+  setTimeout(function() { goTo('history'); }, 700);
 }
 
 /* ============ DAFTAR VENDOR ============ */
+document.getElementById('hargaDaftar').addEventListener('input', function() {
+  var val = parseInt(this.value) || 0;
+  document.getElementById('hargaPreview').textContent = formatRupiah(val);
+});
 async function daftarVendor() {
   var nama = document.getElementById('namaUsaha').value.trim();
   var kategori = document.getElementById('kategoriDaftar').value;
   var kota = document.getElementById('kotaDaftar').value.trim();
   var wa = document.getElementById('waDaftar').value.trim();
-  var harga = document.getElementById('hargaDaftar').value.trim();
+  var harga = parseInt(document.getElementById('hargaDaftar').value) || 0;
   var drive = document.getElementById('driveDaftar').value.trim();
   var paket = document.getElementById('paketDaftar').value;
   var setuju = document.getElementById('setujuDaftar').checked;
-
-  if (!nama || !wa) { alert('Isi Nama Usaha & No WA dulu!'); return; }
-  if (!setuju) { alert('Centang dulu "Setuju dengan ToS & Peraturan" ya!'); return; }
+  if (!nama || nama.length < 2) { showToast('Isi Nama Usaha dulu', 'error'); return; }
+  if (!validasiHP(wa)) { showToast('Format No WA tidak valid', 'error'); return; }
+  if (!setuju) { showToast('Centang dulu persetujuan ToS', 'warning'); return; }
   if (drive && !drive.includes('drive.google.com')) {
     if (!confirm('Link bukan Google Drive. Lanjut saja?')) return;
   }
-
   var badge = paket === 'GRATIS' ? 'STANDARD' : paket;
   if (window.firebaseReady) {
     try {
       await window.addDoc(window.collection(window.db, 'vendors'), {
-        nama: nama, kategori: kategori, kota: kota, wa: wa,
+        nama: nama, kategori: kategori, kota: kota, wa: normalizeHP(wa),
         harga: harga, drive: drive, paket: paket,
         badge: badge, rating: 4.0, createdAt: new Date()
       });
     } catch(e) { console.warn(e); }
   }
-
-  // Tambah ke daftar lokal supaya langsung tampil
   var kat = KATEGORI.find(function(k) { return k.id === kategori; });
   if (kat) {
     kat.vendors.push({
       id: 'v' + Date.now(),
-      nama: nama, kota: kota, harga: harga || 'Hubungi',
+      nama: nama, kota: kota, harga: harga,
       rating: 4.0, badge: badge, desc: 'Vendor baru terdaftar.',
-      wa: wa.replace(/[^0-9]/g, ''), drive: drive
+      wa: normalizeHP(wa), drive: drive
     });
   }
-
   goTo('sukses-daftar');
 }
 
 /* ============ LAPOR ============ */
 function lapor() {
   var a = prompt('Alasan lapor:\n1. Plagiat\n2. Konten tidak pantas\n3. SARA\n4. Penipuan');
-  if (a) alert('Laporan terkirim! Admin verifikasi 3×24 jam.');
+  if (a) showToast('Laporan terkirim. Admin verifikasi 3×24 jam.', 'success');
 }
 
-/* ============ USER PROFILE ============ */
-function refreshUser() {
-  var nama = localStorage.getItem('klienNama') || '';
-  var hp = localStorage.getItem('klienNoHP') || '';
-  document.getElementById('userNama').textContent = nama || 'Belum diisi';
-  document.getElementById('userHP').textContent = 'No HP: ' + (hp || '-');
-  document.getElementById('userAvatar').textContent = nama ? nama.charAt(0).toUpperCase() : '?';
-  document.getElementById('inputUserNama').value = nama;
-  document.getElementById('inputUserHP').value = hp;
+/* ============ PROFIL USER (REDESIGN) ============ */
+
+function refreshProfilUser() {
+  var nama = (localStorage.getItem('klienNama') || '').trim();
+  var hp = (localStorage.getItem('klienNoHP') || '').trim();
+  var empty = document.getElementById('profilEmpty');
+  var locked = document.getElementById('profilLocked');
+  var edit = document.getElementById('profilEdit');
+  if (!empty || !locked || !edit) return;
+
+  var sudahIsi = nama && hp;
+  if (sudahIsi) {
+    empty.style.display = 'none';
+    locked.style.display = 'block';
+    edit.style.display = 'none';
+    document.getElementById('lockedNama').textContent = nama;
+    document.getElementById('lockedHP').textContent = maskHP(hp);
+    document.getElementById('lockedAvatar').textContent = nama.charAt(0).toUpperCase();
+  } else {
+    empty.style.display = 'block';
+    locked.style.display = 'none';
+    edit.style.display = 'none';
+    document.getElementById('inputUserNama').value = nama;
+    document.getElementById('inputUserHP').value = hp;
+  }
 }
 
-function simpanUser() {
+function refreshGreeting() {
+  var nama = (localStorage.getItem('klienNama') || '').trim();
+  var greetEl = document.getElementById('homeGreeting');
+  var subEl = document.getElementById('homeSubgreet');
+  if (!greetEl || !subEl) return;
+  if (nama) {
+    greetEl.textContent = 'Halo, ' + nama.split(' ')[0] + ' 👋';
+    subEl.textContent = '🎨 Kreatif ID';
+    subEl.style.display = 'block';
+  } else {
+    greetEl.textContent = '🎨 Kreatif ID';
+    subEl.style.display = 'none';
+  }
+}
+
+function simpanUserBaru() {
   var nama = document.getElementById('inputUserNama').value.trim();
   var hp = document.getElementById('inputUserHP').value.trim();
-  if (nama) localStorage.setItem('klienNama', nama);
-  if (hp) localStorage.setItem('klienNoHP', hp);
-  refreshUser();
-  alert('Data tersimpan!');
+  if (!nama || nama.length < 2) { showToast('Nama minimal 2 karakter', 'error'); return; }
+  if (!validasiHP(hp)) { showToast('Format No HP tidak valid. Contoh: 08123456789', 'error'); return; }
+  localStorage.setItem('klienNama', nama);
+  localStorage.setItem('klienNoHP', normalizeHP(hp));
+  showToast('Profil berhasil disimpan!', 'success');
+  refreshProfilUser();
+  refreshGreeting();
 }
 
-function clearUser() {
-  if (!confirm('Hapus semua data lokal?')) return;
+function masukModeEdit() {
+  var nama = localStorage.getItem('klienNama') || '';
+  var hp = localStorage.getItem('klienNoHP') || '';
+  document.getElementById('profilEmpty').style.display = 'none';
+  document.getElementById('profilLocked').style.display = 'none';
+  document.getElementById('profilEdit').style.display = 'block';
+  document.getElementById('editAvatar').textContent = nama ? nama.charAt(0).toUpperCase() : '?';
+  document.getElementById('editUserNama').value = nama;
+  document.getElementById('editUserHP').value = hp;
+  setTimeout(function() { document.getElementById('editUserNama').focus(); }, 150);
+}
+
+function batalEdit() {
+  refreshProfilUser();
+}
+
+function simpanEditUser() {
+  var nama = document.getElementById('editUserNama').value.trim();
+  var hp = document.getElementById('editUserHP').value.trim();
+  if (!nama || nama.length < 2) { showToast('Nama minimal 2 karakter', 'error'); return; }
+  if (!validasiHP(hp)) { showToast('Format No HP tidak valid', 'error'); return; }
+  localStorage.setItem('klienNama', nama);
+  localStorage.setItem('klienNoHP', normalizeHP(hp));
+  showToast('Perubahan berhasil disimpan!', 'success');
+  refreshProfilUser();
+  refreshGreeting();
+}
+
+function resetProfil() {
+  if (!confirm('Hapus nama & No HP dari profil ini?\n\nHistory & ulasan Anda tetap tersimpan.')) return;
+  localStorage.removeItem('klienNama');
+  localStorage.removeItem('klienNoHP');
+  showToast('Profil berhasil direset', 'info');
+  refreshProfilUser();
+  refreshGreeting();
+}
+
+function hapusSemuaData() {
+  if (!confirm('⚠️ HAPUS SEMUA DATA?\n\nProfil, history, dan cache akan terhapus permanen. Tidak bisa dibatalkan!')) return;
   localStorage.removeItem('klienNama');
   localStorage.removeItem('klienNoHP');
   localStorage.removeItem('history');
-  refreshUser();
+  showToast('Semua data berhasil dihapus', 'info');
   renderHistory();
-  alert('Data dihapus.');
+  refreshProfilUser();
+  refreshGreeting();
 }
 
-refreshUser();
+/* ============ INIT ============ */
+refreshProfilUser();
+refreshGreeting();
 </script>
 </body>
 </html>
